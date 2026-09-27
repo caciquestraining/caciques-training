@@ -1384,7 +1384,7 @@ async function confirmB(id){
     const amount=Math.round(basePrice*players*disc);
     showToast('💳 Processing payment...');
     try{
-      const res=await fetch('/.netlify/functions/charge',{
+      const res=await fetch('/api/charge',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
