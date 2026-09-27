@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Caciques Training LLC — Book a Session</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--green:#1B4D2E;--green2:#24673D;--green3:#0f2e1b;--gold:#F5A623;--gold2:#ffc045;--cream:#F7F4EE;--white:#FFFFFF;--gray:#7A8290;--light:#EEF2EC;--red:#C0392B;--pending:#e67e22;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--green);overflow-x:hidden;}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(15,46,27,.97);backdrop-filter:blur(10px);display:flex;justify-content:space-between;align-items:center;padding:14px 48px;border-bottom:2px solid rgba(245,166,35,.2);}
+.logo-wrap{display:flex;align-items:center;gap:12px;}
+.logo-circle{width:42px;height:42px;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;color:var(--gold);letter-spacing:.1em;line-height:1;}
+.logo-text span{color:rgba(255,255,255,.6);font-size:.78rem;display:block;letter-spacing:.15em;}
+.nav-links{display:flex;gap:24px;align-items:center;}
+nav a{color:rgba(255,255,255,.6);text-decoration:none;font-size:.8rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;transition:color .2s;}
+nav a:hover{color:var(--gold);}
+.nav-admin{background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.35);color:var(--gold) !important;padding:7px 14px;border-radius:2px;font-size:.72rem !important;}
+.nav-admin:hover{background:rgba(245,166,35,.22) !important;}
+
+.hero{min-height:100vh;background:var(--green3);display:flex;flex-direction:column;justify-content:center;padding:120px 48px 80px;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 65% 50%,rgba(36,103,61,.45) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 15% 80%,rgba(245,166,35,.07) 0%,transparent 60%);}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(245,166,35,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(245,166,35,.045) 1px,transparent 1px);background-size:55px 55px;}
+.hero-content{position:relative;z-index:2;max-width:660px;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.28);color:var(--gold);font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:6px 14px;border-radius:2px;margin-bottom:22px;animation:fadeUp .6s ease both;}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,10vw,7rem);line-height:.92;color:var(--white);letter-spacing:.02em;animation:fadeUp .6s .1s ease both;}
+.hero h1 em{font-style:normal;color:var(--gold);display:block;}
+.hero-sub{margin-top:18px;font-size:.98rem;color:rgba(255,255,255,.52);line-height:1.72;max-width:430px;font-weight:300;animation:fadeUp .6s .2s ease both;}
+.hero-cta{margin-top:38px;display:flex;gap:12px;flex-wrap:wrap;animation:fadeUp .6s .3s ease both;}
+.btn-primary{background:var(--gold);color:var(--green3);font-family:'Outfit',sans-serif;font-weight:700;font-size:.86rem;letter-spacing:.08em;text-transform:uppercase;padding:14px 30px;border:none;border-radius:2px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-2px);}
+.btn-outline{background:transparent;color:var(--white);font-family:'Outfit',sans-serif;font-weight:600;font-size:.86rem;letter-spacing:.08em;text-transform:uppercase;padding:14px 30px;border:1px solid rgba(255,255,255,.22);border-radius:2px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px);}
+
+.stats-bar{background:var(--gold);display:flex;justify-content:center;}
+.stat{flex:1;max-width:200px;text-align:center;padding:18px 14px;border-right:1px solid rgba(0,0,0,.1);}
+.stat:last-child{border-right:none;}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:2.1rem;color:var(--green3);letter-spacing:.05em;line-height:1;}
+.stat-l{font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(15,46,27,.55);margin-top:3px;}
+
+.programs{padding:90px 48px;max-width:1000px;margin:0 auto;}
+.eyebrow{font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.4rem);color:var(--green);letter-spacing:.03em;line-height:1;margin-bottom:44px;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:18px;}
+.card{background:var(--white);border-radius:4px;overflow:hidden;border:1px solid rgba(27,77,46,.1);transition:transform .25s,box-shadow .25s;}
+.card:hover{transform:translateY(-5px);box-shadow:0 16px 48px rgba(27,77,46,.11);}
+.card-bar{height:5px;background:var(--gold);}
+.card-body{padding:26px 22px;}
+.card-icon{font-size:1.7rem;margin-bottom:12px;display:block;}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:.04em;color:var(--green);margin-bottom:7px;}
+.card-desc{font-size:.83rem;color:var(--gray);line-height:1.6;margin-bottom:14px;font-weight:300;}
+.card-price{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;color:var(--green);letter-spacing:.04em;margin-bottom:14px;}
+.card-price span{font-size:.82rem;font-family:'Outfit',sans-serif;color:var(--gray);font-weight:300;}
+.card-features{list-style:none;margin-bottom:22px;}
+.card-features li{font-size:.8rem;color:var(--green);padding:4px 0;display:flex;gap:8px;}
+.card-features li::before{content:'✓';color:var(--gold);font-weight:700;flex-shrink:0;}
+
+#book{background:var(--green3);padding:90px 48px;position:relative;overflow:hidden;}
+#book::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(245,166,35,.038) 1px,transparent 1px),linear-gradient(90deg,rgba(245,166,35,.038) 1px,transparent 1px);background-size:48px 48px;}
+.book-wrap{max-width:800px;margin:0 auto;position:relative;z-index:2;}
+#book .eyebrow{color:rgba(245,166,35,.55);}
+#book .section-title{color:var(--white);margin-bottom:32px;}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.fg{display:flex;flex-direction:column;gap:6px;}
+.fg.full{grid-column:1/-1;}
+.fg label{font-size:.68rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.42);}
+.fg label .req{color:var(--gold);margin-left:2px;}
+.fg input,.fg select,.fg textarea{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.11);color:var(--white);font-family:'Outfit',sans-serif;font-size:.9rem;padding:11px 14px;border-radius:2px;outline:none;transition:border-color .2s,background .2s;width:100%;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold);background:rgba(245,166,35,.055);}
+.fg input::placeholder,.fg textarea::placeholder{color:rgba(255,255,255,.22);}
+.fg select option{background:#1B4D2E;color:white;}
+.fg textarea{resize:vertical;min-height:85px;}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px;}
+.chip{position:relative;}
+.chip input{position:absolute;opacity:0;width:0;height:0;}
+.chip label{display:inline-block;padding:6px 14px;border:1px solid rgba(255,255,255,.13);border-radius:20px;cursor:pointer;font-size:.78rem;font-weight:500;color:rgba(255,255,255,.52);transition:all .2s;}
+.chip input:checked+label{border-color:var(--gold);background:rgba(245,166,35,.13);color:var(--gold);font-weight:600;}
+.chip label:hover{border-color:rgba(245,166,35,.45);}
+
+.slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:9px;}
+.slot-opt{position:relative;}
+.slot-opt input{position:absolute;opacity:0;width:0;height:0;}
+.slot-opt label{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:13px 8px;border:1px solid rgba(255,255,255,.12);border-radius:3px;cursor:pointer;transition:all .2s;text-align:center;}
+.slot-time{font-size:.9rem;font-weight:700;color:var(--white);}
+.slot-spots{font-size:.68rem;color:rgba(255,255,255,.4);margin-top:3px;}
+.slot-opt.is-full label{opacity:.35;cursor:not-allowed;border-color:rgba(255,255,255,.05);}
+.slot-opt input:checked+label{border-color:var(--gold);background:rgba(245,166,35,.13);}
+.slot-opt label:hover{border-color:rgba(245,166,35,.45);}
+
+.pay-chips{display:flex;gap:9px;flex-wrap:wrap;}
+.pay-chip{position:relative;flex:1;min-width:90px;}
+.pay-chip input{position:absolute;opacity:0;width:0;height:0;}
+.pay-chip label{display:flex;align-items:center;justify-content:center;gap:5px;padding:11px;border:1px solid rgba(255,255,255,.13);border-radius:2px;cursor:pointer;font-size:.82rem;font-weight:500;color:rgba(255,255,255,.55);transition:all .2s;text-align:center;}
+.pay-chip input:checked+label{border-color:var(--gold);background:rgba(245,166,35,.11);color:var(--gold);}
+
+.divider{grid-column:1/-1;border:none;border-top:1px solid rgba(255,255,255,.07);margin:4px 0;}
+.sub-head{grid-column:1/-1;font-size:.65rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);opacity:.65;}
+.submit-area{grid-column:1/-1;margin-top:6px;}
+.btn-submit{width:100%;background:var(--gold);color:var(--green3);font-family:'Outfit',sans-serif;font-weight:700;font-size:.92rem;letter-spacing:.1em;text-transform:uppercase;padding:16px;border:none;border-radius:2px;cursor:pointer;transition:all .2s;}
+.btn-submit:hover{background:var(--gold2);transform:translateY(-2px);}
+.form-note{text-align:center;font-size:.72rem;color:rgba(255,255,255,.28);margin-top:11px;font-weight:300;}
+.btn-see-slots{background:var(--gold);color:var(--green3);font-weight:700;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;padding:11px 18px;border:none;border-radius:2px;cursor:pointer;white-space:nowrap;transition:background .2s;}
+.btn-see-slots:hover{background:var(--gold2);}
+
+.success-screen{display:none;flex-direction:column;align-items:center;text-align:center;padding:48px 20px;gap:16px;}
+.success-icon{width:68px;height:68px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.9rem;}
+.success-screen h2{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;color:var(--white);letter-spacing:.05em;}
+.success-screen p{color:rgba(255,255,255,.48);font-size:.9rem;max-width:360px;line-height:1.65;font-weight:300;}
+.success-card{background:rgba(255,255,255,.05);border:1px solid rgba(245,166,35,.22);border-radius:3px;padding:20px 26px;text-align:left;width:100%;max-width:400px;font-size:.83rem;color:rgba(255,255,255,.72);line-height:2;}
+.success-card strong{color:var(--gold);}
+.pending-notice{background:rgba(230,126,34,.1);border:1px solid rgba(230,126,34,.28);border-radius:3px;padding:12px 16px;font-size:.8rem;color:rgba(255,190,90,.82);line-height:1.6;max-width:400px;width:100%;}
+
+/* ADMIN LOGIN */
+.admin-login-screen{display:none;position:fixed;inset:0;z-index:200;background:var(--green3);align-items:center;justify-content:center;}
+.login-box{background:rgba(255,255,255,.045);border:1px solid rgba(245,166,35,.18);border-radius:6px;padding:44px 38px;width:100%;max-width:360px;text-align:center;}
+.login-box h2{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--white);letter-spacing:.05em;margin-bottom:5px;}
+.login-box p{color:rgba(255,255,255,.38);font-size:.82rem;margin-bottom:26px;}
+.login-box input{width:100%;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.13);color:var(--white);font-family:'Outfit',sans-serif;font-size:.92rem;padding:12px 14px;border-radius:2px;outline:none;margin-bottom:12px;transition:border-color .2s;}
+.login-box input:focus{border-color:var(--gold);}
+.login-box input::placeholder{color:rgba(255,255,255,.22);}
+.login-err{color:#e74c3c;font-size:.78rem;margin-bottom:9px;display:none;}
+.btn-back{margin-top:11px;background:transparent;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.8rem;font-family:'Outfit',sans-serif;width:100%;}
+
+/* ADMIN PANEL */
+.admin-panel{display:none;background:var(--cream);min-height:100vh;padding:90px 48px 60px;}
+.admin-wrap{max-width:1000px;margin:0 auto;}
+.admin-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:36px;flex-wrap:wrap;gap:12px;}
+.admin-title{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;color:var(--green);letter-spacing:.04em;}
+.btn-logout{background:transparent;border:1px solid rgba(27,77,46,.22);color:var(--gray);font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:8px 16px;border-radius:2px;cursor:pointer;transition:all .2s;}
+.btn-logout:hover{border-color:var(--red);color:var(--red);}
+
+.panel{background:var(--white);border-radius:4px;border:1px solid rgba(27,77,46,.09);padding:26px;margin-bottom:24px;}
+.panel-title{font-family:'Bebas Neue',sans-serif;font-size:1.45rem;color:var(--green);letter-spacing:.04em;margin-bottom:18px;}
+.day-row{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(27,77,46,.06);}
+.day-row:last-child{border-bottom:none;}
+.day-name{font-weight:600;font-size:.85rem;color:var(--green);}
+.slots-row{display:flex;gap:7px;flex-wrap:wrap;}
+.slot-tag{background:var(--light);border:1px solid rgba(27,77,46,.13);border-radius:2px;padding:5px 10px;font-size:.75rem;font-weight:600;color:var(--green);display:flex;align-items:center;gap:5px;cursor:pointer;transition:all .2s;}
+.slot-tag:hover{border-color:var(--red);color:var(--red);}
+.slot-tag .x{font-size:.6rem;opacity:.55;}
+.slot-tag.is-vip{border-color:rgba(245,166,35,.5);color:#7a5800;background:rgba(245,166,35,.1);}
+.add-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid rgba(27,77,46,.07);}
+.add-form select{background:var(--cream);border:1px solid rgba(27,77,46,.18);color:var(--green);font-family:'Outfit',sans-serif;font-size:.83rem;padding:8px 11px;border-radius:2px;outline:none;}
+.add-form select:focus{border-color:var(--gold);}
+.btn-add{background:var(--green);color:var(--white);font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 14px;border:none;border-radius:2px;cursor:pointer;white-space:nowrap;transition:background .2s;}
+.btn-add:hover{background:var(--green2);}
+
+.filters{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.filter-btn{background:var(--light);border:1px solid rgba(27,77,46,.13);color:var(--green);font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:6px 14px;border-radius:2px;cursor:pointer;transition:all .2s;}
+.filter-btn.active,.filter-btn:hover{background:var(--green);color:var(--white);border-color:var(--green);}
+
+.bcard{border:1px solid rgba(27,77,46,.1);border-radius:3px;padding:16px 18px;margin-bottom:10px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;transition:box-shadow .2s;}
+.bcard:hover{box-shadow:0 4px 18px rgba(27,77,46,.07);}
+.bcard.is-vip{border-left:3px solid var(--gold);}
+.bcard.is-confirmed{border-left:3px solid var(--green);}
+.bcard.is-declined{opacity:.45;}
+.bc-name{font-weight:700;font-size:.92rem;color:var(--green);margin-bottom:4px;}
+.bc-meta{font-size:.75rem;color:var(--gray);line-height:1.85;}
+.bc-meta strong{color:var(--green);font-weight:600;}
+.bc-actions{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap;}
+.bc-status{display:inline-flex;align-items:center;gap:4px;font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:2px;white-space:nowrap;}
+.s-pending{background:rgba(230,126,34,.1);color:var(--pending);}
+.s-confirmed{background:rgba(27,77,46,.1);color:var(--green);}
+.s-vip{background:rgba(245,166,35,.13);color:#9a6800;}
+.s-declined{background:rgba(192,57,43,.09);color:var(--red);}
+.btn-confirm{background:var(--green);color:white;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 13px;border:none;border-radius:2px;cursor:pointer;transition:background .2s;}
+.btn-confirm:hover{background:var(--green2);}
+.btn-decline{background:transparent;color:var(--red);font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 13px;border:1px solid rgba(192,57,43,.28);border-radius:2px;cursor:pointer;transition:all .2s;}
+.btn-decline:hover{background:rgba(192,57,43,.07);}
+.btn-text{background:var(--gold);color:var(--green3);font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 13px;border:none;border-radius:2px;cursor:pointer;}
+.empty{text-align:center;padding:36px;color:var(--gray);font-size:.88rem;}
+
+/* VIP link box in admin */
+.vip-link-box{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.3);border-radius:4px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.vip-link-label{font-size:.78rem;font-weight:700;color:var(--green);letter-spacing:.1em;text-transform:uppercase;}
+.vip-link-url{font-family:monospace;font-size:.85rem;color:var(--green2);background:var(--light);padding:8px 14px;border-radius:2px;border:1px solid rgba(27,77,46,.15);flex:1;min-width:200px;}
+.btn-copy{background:var(--green);color:white;font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;border:none;border-radius:2px;cursor:pointer;white-space:nowrap;}
+.btn-copy:hover{background:var(--green2);}
+
+/* ABOUT MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--green3);border:1px solid rgba(245,166,35,.25);border-radius:6px;width:100%;max-width:900px;max-height:90vh;overflow-y:auto;position:relative;animation:modalIn .3s ease;}
+@keyframes modalIn{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+.modal-close{position:sticky;top:0;z-index:10;display:flex;justify-content:flex-end;padding:16px 20px;background:var(--green3);border-bottom:1px solid rgba(245,166,35,.1);}
+.modal-close button{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:8px 16px;border-radius:2px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;}
+.modal-close button:hover{border-color:var(--gold);color:var(--gold);}
+.modal-inner{padding:40px 48px 52px;position:relative;}
+.modal-inner::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(245,166,35,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(245,166,35,.035) 1px,transparent 1px);background-size:55px 55px;pointer-events:none;}
+.modal-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:48px;align-items:start;position:relative;z-index:1;}
+@media(max-width:680px){.modal-grid{grid-template-columns:1fr;gap:28px;}.modal-inner{padding:28px 22px 40px;}}
+footer{background:var(--green3);border-top:1px solid rgba(245,166,35,.13);padding:40px 48px;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:start;flex-wrap:wrap;gap:24px;}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;color:var(--gold);letter-spacing:.1em;}
+.footer-logo span{color:rgba(255,255,255,.45);}
+footer p{font-size:.72rem;color:rgba(255,255,255,.28);}
+footer a{color:var(--gold);text-decoration:none;font-size:.78rem;font-weight:500;}
+.footer-address{font-size:.78rem;color:rgba(255,255,255,.45);line-height:1.8;}
+.footer-address strong{color:rgba(255,255,255,.7);font-weight:600;font-size:.8rem;}
+/* Call/Text button */
+.contact-btn{position:fixed;bottom:28px;right:28px;z-index:200;background:var(--gold);color:var(--green3);width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 4px 20px rgba(245,166,35,.4);text-decoration:none;transition:transform .2s,box-shadow .2s;}
+.contact-btn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(245,166,35,.55);}
+.contact-tooltip{position:fixed;bottom:36px;right:94px;z-index:200;background:var(--green3);border:1px solid rgba(245,166,35,.25);color:var(--white);font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:600;padding:8px 14px;border-radius:3px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;}
+.contact-btn:hover~.contact-tooltip{opacity:1;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+
+@media(max-width:680px){
+  nav{padding:12px 18px;}
+  .nav-links{gap:14px;}
+  .hero{padding:100px 22px 55px;}
+  .programs{padding:60px 22px;}
+  #book{padding:60px 22px;}
+  #about{padding:60px 22px !important;}
+  #about > div > div:first-child + div {grid-template-columns:1fr !important;}
+  #about > div > div {grid-template-columns:1fr !important;gap:32px !important;}
+  .form-grid{grid-template-columns:1fr;}
+  .fg.full{grid-column:1;}
+  .stats-bar{flex-wrap:wrap;}
+  .stat{min-width:50%;}
+  footer{flex-direction:column;text-align:center;padding:22px;}
+  .admin-panel{padding:80px 18px 40px;}
+  .day-row{grid-template-columns:1fr;}
+  .bcard{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ MAIN SITE ════════════════════════════════════════════════ -->
+<div id="mainSite">
+<nav>
+  <div class="logo-wrap">
+    <div class="logo-circle">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <ellipse cx="18" cy="11" rx="4" ry="4.5" fill="#1B4D2E"/>
+        <path d="M14 15 Q10 20 11 28 L15 28 L16 22 L20 22 L21 28 L25 28 Q26 20 22 15 Z" fill="#1B4D2E"/>
+        <path d="M16 18 Q22 14 30 12 L29 10 Q21 11 15 16 Z" fill="#F5A623"/>
+        <path d="M11 28 Q9 32 12 33" stroke="#1B4D2E" stroke-width="1.5" fill="none"/>
+        <path d="M25 28 Q27 32 24 33" stroke="#1B4D2E" stroke-width="1.5" fill="none"/>
+      </svg>
+    </div>
+    <div class="logo-text">Caciques<span>Training LLC</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="#" onclick="openAbout();return false;">About</a>
+    <a href="#services">Programs</a>
+    <a href="#book">Book Now</a>
+    <a href="#" onclick="showLogin(event)" class="nav-admin">Coach Login</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">⚾ Elite Baseball Training</div>
+    <h1>Train Like<em>A Cacique.</em></h1>
+    <p class="hero-sub">Professional group baseball coaching for all levels. Mon–Fri 3PM–9PM. Batting, fielding, catcher lessons and combo packages available.</p>
+    <div class="hero-cta">
+      <a href="#book" class="btn-primary">Book a Session</a>
+      <a href="#services" class="btn-outline">View Programs</a>
+      <button onclick="openAbout()" class="btn-outline" style="display:inline-flex;align-items:center;gap:8px;">⚾ Meet the Coach</button>
+    </div>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-n">200+</div><div class="stat-l">Players Trained</div></div>
+  <div class="stat"><div class="stat-n">8+</div><div class="stat-l">Years Coaching</div></div>
+  <div class="stat"><div class="stat-n">PRO</div><div class="stat-l">Player Background</div></div>
+  <div class="stat"><div class="stat-n">$60</div><div class="stat-l">Per Session</div></div>
+</div>
+
+<section class="programs" id="services">
+  <div class="eyebrow">What We Offer</div>
+  <div class="section-title">Our Programs</div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-bar"></div>
+      <div class="card-body">
+        <span class="card-icon">🏏</span>
+        <div class="card-title">Batting</div>
+        <p class="card-desc">Group batting session focused on swing mechanics, contact, power development and situational hitting drills.</p>
+        <div class="card-price">$60 <span>/ player</span></div>
+        <ul class="card-features">
+          <li>Group session, group sessions</li>
+          <li>Swing mechanics & contact work</li>
+          <li>Power & bat speed training</li>
+          <li>Coach confirmation required</li>
+        </ul>
+        <a href="#book" class="btn-primary" style="width:100%;text-align:center;display:block;">Book Batting Session</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-bar"></div>
+      <div class="card-body">
+        <span class="card-icon">🧤</span>
+        <div class="card-title">Fielding</div>
+        <p class="card-desc">Group defensive session — footwork, glove work, range, positioning and throwing mechanics for all positions.</p>
+        <div class="card-price">$60 <span>/ player</span></div>
+        <ul class="card-features">
+          <li>Group session, group sessions</li>
+          <li>Footwork & positioning</li>
+          <li>Glove work & throwing mechanics</li>
+          <li>Coach confirmation required</li>
+        </ul>
+        <a href="#book" class="btn-primary" style="width:100%;text-align:center;display:block;">Book Fielding Session</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-bar"></div>
+      <div class="card-body">
+        <span class="card-icon">⚾</span>
+        <div class="card-title">Catcher Lessons</div>
+        <p class="card-desc">Group sessions for catchers — blocking, framing, pop time, receiving and game-management skills behind the plate.</p>
+        <div class="card-price">$60 <span>/ player</span></div>
+        <ul class="card-features">
+          <li>Group session, group sessions</li>
+          <li>Blocking, framing & pop time</li>
+          <li>Receiving & game management</li>
+          <li>Coach confirmation required</li>
+        </ul>
+        <a href="#book" class="btn-primary" style="width:100%;text-align:center;display:block;">Book Catcher Lesson</a>
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(245,166,35,.35);">
+      <div class="card-bar" style="background:linear-gradient(90deg,var(--green),var(--gold));height:6px;"></div>
+      <div class="card-body">
+        <span class="card-icon">⚡</span>
+        <div class="card-title">Batting + Fielding Package</div>
+        <p class="card-desc">Get both group sessions together at a special package price — the best value for players who want to develop their full game.</p>
+        <div class="card-price">$100 <span style="text-decoration:line-through;font-size:.85rem;color:#aaa;">$120</span></div>
+        <ul class="card-features">
+          <li>Group batting session included</li>
+          <li>Group fielding session included</li>
+          <li>Save $20 vs. booking separately</li>
+          <li>Coach confirmation required</li>
+        </ul>
+        <a href="#book" class="btn-primary" style="width:100%;text-align:center;display:block;background:var(--green);">Book Package</a>
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(245,166,35,.5);grid-column:1/-1;">
+      <div class="card-bar" style="background:var(--gold);height:6px;"></div>
+      <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+        <div>
+          <span class="card-icon">📦</span>
+          <div class="card-title">4-Session Pack <span style="background:var(--gold);color:var(--green3);font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:2px;margin-left:8px;vertical-align:middle;">BEST VALUE</span></div>
+          <p class="card-desc" style="margin-bottom:14px;">Commit to your development with 4 sessions of any type. Valid for one month — at least one session per week keeps your progress on track.</p>
+          <div class="card-price" style="margin-bottom:4px;">$200 <span style="text-decoration:line-through;font-size:.85rem;color:#aaa;">$240</span></div>
+          <p style="font-size:.78rem;color:var(--gray);margin-bottom:18px;">Save $40 vs. individual rate</p>
+          <a href="#book" class="btn-primary" style="display:inline-block;background:var(--gold);">Buy 4-Session Pack</a>
+        </div>
+        <ul class="card-features" style="margin-top:8px;">
+          <li>4 sessions of any type (batting, fielding or catcher)</li>
+          <li>Valid for 1 month from purchase date</li>
+          <li>At least 1 session per week recommended</li>
+          <li>Unused sessions after 1 month are forfeited</li>
+          <li>Sessions subject to coach confirmation</li>
+          <li>Cancellations: 24hr notice to rebook same week</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CANCELLATION POLICY -->
+<section style="background:var(--green);padding:48px 48px;">
+  <div style="max-width:860px;margin:0 auto;display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:start;">
+    <div style="font-size:2rem;padding-top:4px;">📋</div>
+    <div>
+      <div style="font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,166,35,.7);margin-bottom:8px;">Cancellation Policy</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--white);letter-spacing:.04em;margin-bottom:14px;">We Respect Your Time — And Ours.</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+        <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:3px;padding:16px 18px;">
+          <div style="font-size:1.1rem;margin-bottom:8px;">✅</div>
+          <div style="font-size:.82rem;font-weight:700;color:var(--gold);margin-bottom:5px;letter-spacing:.04em;">24+ Hours Notice</div>
+          <div style="font-size:.8rem;color:rgba(255,255,255,.6);line-height:1.6;font-weight:300;">You may rebook within the same week at no charge.</div>
+        </div>
+        <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:3px;padding:16px 18px;">
+          <div style="font-size:1.1rem;margin-bottom:8px;">⚠️</div>
+          <div style="font-size:.82rem;font-weight:700;color:var(--gold);margin-bottom:5px;letter-spacing:.04em;">Same-Day Cancellation</div>
+          <div style="font-size:.8rem;color:rgba(255,255,255,.6);line-height:1.6;font-weight:300;">The session is forfeited and counts toward your package or booking.</div>
+        </div>
+        <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:3px;padding:16px 18px;">
+          <div style="font-size:1.1rem;margin-bottom:8px;">📦</div>
+          <div style="font-size:.82rem;font-weight:700;color:var(--gold);margin-bottom:5px;letter-spacing:.04em;">4-Session Pack</div>
+          <div style="font-size:.8rem;color:rgba(255,255,255,.6);line-height:1.6;font-weight:300;">Sessions not used within 1 month of purchase are forfeited.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" style="background:var(--cream);padding:90px 48px;">
+  <div style="max-width:1000px;margin:0 auto;">
+    <div style="font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">What People Are Saying</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.4rem);color:var(--green);letter-spacing:.03em;line-height:1;margin-bottom:48px;">Trusted by Players<br>& Their Families.</div>
+
+    <!-- Cecil Fielder featured video -->
+    <div style="background:var(--green3);border:2px solid rgba(245,166,35,.35);border-radius:6px;overflow:hidden;margin-bottom:36px;">
+      <div style="background:linear-gradient(90deg,var(--green),var(--green3));padding:14px 24px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(245,166,35,.2);">
+        <span style="font-size:1rem;">🏆</span>
+        <span style="font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);">Featured · MLB Legend</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:0;align-items:stretch;">
+        <!-- Cecil Fielder Video -->
+        <div style="background:#000;display:flex;align-items:center;justify-content:center;min-height:260px;position:relative;">
+          <video
+            controls
+            playsinline
+            style="width:100%;height:100%;min-height:260px;object-fit:cover;display:block;"
+            poster="">
+            <source src="Cecil_fielder_testimonio.mp4" type="video/mp4"/>
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <!-- Quote -->
+        <div style="padding:32px;display:flex;flex-direction:column;justify-content:center;gap:16px;">
+          <div style="font-size:3rem;color:var(--gold);line-height:1;opacity:.4;">"</div>
+          <p style="font-size:.95rem;color:rgba(255,255,255,.75);line-height:1.75;font-weight:300;font-style:italic;margin-top:-20px;">
+            Watch what MLB veteran Cecil Fielder has to say about Coach Alejandro and the Caciques Training program — straight from a baseball legend who knows what elite development looks like.
+          </p>
+          <div style="border-top:1px solid rgba(245,166,35,.2);padding-top:16px;">
+            <div style="font-weight:700;color:var(--gold);font-size:.92rem;">Cecil Fielder</div>
+            <div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-top:3px;">MLB Veteran · Detroit Tigers, New York Yankees</div>
+            <div style="font-size:.72rem;color:rgba(255,255,255,.3);margin-top:2px;">Parent of Caciques Training athlete</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Text testimonial cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;">
+
+      <!-- Real testimonial: Christopher Montes -->
+      <div style="background:var(--white);border:1px solid rgba(27,77,46,.1);border-radius:4px;padding:26px;border-top:3px solid var(--gold);">
+        <div style="font-size:2rem;color:var(--gold);line-height:1;opacity:.35;margin-bottom:8px;">"</div>
+        <p style="font-size:.88rem;color:var(--gray);line-height:1.72;font-style:italic;margin-bottom:20px;font-weight:300;">
+          My son Christopher has been going to Coach Ale since he was 5 years old (7 now) and he has improved so much. He doesn't just put the ball on the tee — he instructs them as they go. He will stop practice to make sure they're doing things the right way. He takes pride in making sure the kids succeed. 10/10 in my book! 🙏🏼
+        </p>
+        <div style="border-top:1px solid rgba(27,77,46,.08);padding-top:14px;">
+          <div style="font-weight:700;font-size:.88rem;color:var(--green);">Parent of Christopher Montes</div>
+          <div style="font-size:.75rem;color:var(--gray);margin-top:2px;">Caciques Training athlete, Age 7 · Tampa, FL</div>
+          <div style="display:flex;gap:2px;margin-top:6px;">⭐⭐⭐⭐⭐</div>
+        </div>
+      </div>
+
+      <!-- Placeholder 2 -->
+      <div style="background:var(--white);border:1px solid rgba(27,77,46,.1);border-radius:4px;padding:26px;border-top:3px solid rgba(27,77,46,.15);opacity:.5;">
+        <div style="font-size:2rem;color:var(--gold);line-height:1;opacity:.35;margin-bottom:8px;">"</div>
+        <p style="font-size:.88rem;color:var(--gray);line-height:1.72;font-style:italic;margin-bottom:20px;font-weight:300;">
+          More testimonials coming soon...
+        </p>
+        <div style="border-top:1px solid rgba(27,77,46,.08);padding-top:14px;">
+          <div style="font-weight:700;font-size:.88rem;color:var(--green);">Parent Name</div>
+          <div style="font-size:.75rem;color:var(--gray);margin-top:2px;">Caciques Training parent · Tampa, FL</div>
+          <div style="display:flex;gap:2px;margin-top:6px;">⭐⭐⭐⭐⭐</div>
+        </div>
+      </div>
+
+      <!-- Placeholder 3 -->
+      <div style="background:var(--white);border:1px solid rgba(27,77,46,.1);border-radius:4px;padding:26px;border-top:3px solid rgba(27,77,46,.15);opacity:.5;">
+        <div style="font-size:2rem;color:var(--gold);line-height:1;opacity:.35;margin-bottom:8px;">"</div>
+        <p style="font-size:.88rem;color:var(--gray);line-height:1.72;font-style:italic;margin-bottom:20px;font-weight:300;">
+          More testimonials coming soon...
+        </p>
+        <div style="border-top:1px solid rgba(27,77,46,.08);padding-top:14px;">
+          <div style="font-weight:700;font-size:.88rem;color:var(--green);">Parent Name</div>
+          <div style="font-size:.75rem;color:var(--gray);margin-top:2px;">Caciques Training parent · Tampa, FL</div>
+          <div style="display:flex;gap:2px;margin-top:6px;">⭐⭐⭐⭐⭐</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="book">
+  <div class="book-wrap">
+    <div class="eyebrow">Reserve Your Spot</div>
+    <div class="section-title">Book a Session</div>
+    <div id="bookForm">
+      <div class="form-grid">
+        <div class="fg full">
+          <label>Session Type <span class="req">*</span></label>
+          <div class="chips">
+            <div class="chip"><input type="radio" name="stype" id="st1" value="Batting" checked/><label for="st1">🏏 Batting — $60/player</label></div>
+            <div class="chip"><input type="radio" name="stype" id="st2" value="Fielding"/><label for="st2">🧤 Fielding — $60/player</label></div>
+            <div class="chip"><input type="radio" name="stype" id="st3" value="Catcher Lessons"/><label for="st3">⚾ Catcher Lessons — $60/player</label></div>
+            <div class="chip"><input type="radio" name="stype" id="st4" value="Batting + Fielding Package"/><label for="st4">⚡ Batting + Fielding — $100</label></div>
+            <div class="chip"><input type="radio" name="stype" id="st5" value="4-Session Pack"/><label for="st5">📦 4-Session Pack — $200</label></div>
+          </div>
+        </div>
+        <hr class="divider"/>
+        <div class="sub-head">Player Information</div>
+        <div class="fg"><label>Player Name <span class="req">*</span></label><input type="text" id="pName" placeholder="Full name"/></div>
+        <div class="fg"><label>Age <span class="req">*</span></label><input type="number" id="pAge" placeholder="e.g. 12" min="5" max="50"/></div>
+        <div class="fg"><label>Contact / Parent <span class="req">*</span></label><input type="text" id="pContact" placeholder="Parent or guardian name"/></div>
+        <div class="fg"><label>Phone / WhatsApp <span class="req">*</span></label><input type="tel" id="pPhone" placeholder="(555) 000-0000"/></div>
+        <div class="fg full"><label>Email <span class="req">*</span></label><input type="email" id="pEmail" placeholder="you@email.com"/></div>
+        <hr class="divider"/>
+        <div class="sub-head">Baseball Profile</div>
+        <div class="fg full">
+          <label>Skill Level <span class="req">*</span></label>
+          <div class="chips">
+            <div class="chip"><input type="radio" name="level" id="lv1" value="Beginner" checked/><label for="lv1">Beginner</label></div>
+            <div class="chip"><input type="radio" name="level" id="lv2" value="Intermediate"/><label for="lv2">Intermediate</label></div>
+            <div class="chip"><input type="radio" name="level" id="lv3" value="Advanced"/><label for="lv3">Advanced</label></div>
+            <div class="chip"><input type="radio" name="level" id="lv4" value="Travel Ball"/><label for="lv4">Travel Ball</label></div>
+          </div>
+        </div>
+        <div class="fg full">
+          <label>Position(s) <span class="req">*</span></label>
+          <div class="chips">
+            <div class="chip"><input type="checkbox" id="pos1" value="Pitcher"/><label for="pos1">⚾ Pitcher</label></div>
+            <div class="chip"><input type="checkbox" id="pos2" value="Catcher"/><label for="pos2">🧤 Catcher</label></div>
+            <div class="chip"><input type="checkbox" id="pos3" value="Infield"/><label for="pos3">Infield</label></div>
+            <div class="chip"><input type="checkbox" id="pos4" value="Outfield"/><label for="pos4">Outfield</label></div>
+            <div class="chip"><input type="checkbox" id="pos5" value="Batter/DH"/><label for="pos5">🏏 Batter/DH</label></div>
+            <div class="chip"><input type="checkbox" id="pos6" value="All-around"/><label for="pos6">All-around</label></div>
+          </div>
+        </div>
+        <hr class="divider"/>
+        <div class="sub-head">Pick a Time Slot</div>
+        <div class="fg full">
+          <label>Choose a Date <span class="req">*</span></label>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <input type="date" id="pDate" style="flex:1;min-width:170px;"/>
+            <button class="btn-see-slots" onclick="loadSlots()" type="button">See Slots →</button>
+          </div>
+        </div>
+        <div class="fg full" id="slotWrap" style="display:none;">
+          <label>Available Slots <span class="req">*</span></label>
+          <div class="slot-grid" id="slotGrid"></div>
+        </div>
+        <hr class="divider"/>
+        <div class="sub-head">Payment</div>
+        <div class="fg full">
+          <label>Preferred Payment <span class="req">*</span></label>
+          <div class="pay-chips">
+            <div class="pay-chip"><input type="radio" name="pay" id="py1" value="Cash" checked/><label for="py1">💵 Cash</label></div>
+            <div class="pay-chip"><input type="radio" name="pay" id="py2" value="Zelle"/><label for="py2">📲 Zelle</label></div>
+            <div class="pay-chip"><input type="radio" name="pay" id="py3" value="Venmo"/><label for="py3">💙 Venmo</label></div>
+          </div>
+        </div>
+        <div class="fg full"><label>Goals / Notes</label><textarea id="pNotes" placeholder="What would you like to work on?"></textarea></div>
+        <div class="submit-area">
+          <button class="btn-submit" onclick="submitBooking()">⚾ Submit Booking Request</button>
+          <p class="form-note">Coach Alejandro will review and confirm within 24 hrs. No payment until confirmed.<br>📍 5901 W. Linebaugh Ave, Tampa, FL 33624 · (813) 998-7941</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✓</div>
+      <h2>Request Sent!</h2>
+      <p>Coach Alejandro will review your booking and confirm within 24 hours.</p>
+      <div class="success-card" id="successDetail"></div>
+      <div class="pending-notice">⏳ Your spot is <strong>pending confirmation</strong>. If the time doesn't work for your group's age mix, the coach may reach out to find a better fit.</div>
+      <button class="btn-primary" onclick="resetForm()">Book Another Session</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <div class="footer-logo">Caciques <span>Training LLC</span></div>
+    <p style="margin-top:8px;">© 2025 Caciques Training LLC · All rights reserved</p>
+    <p style="margin-top:6px;"><a href="mailto:info@caciquestraining.com">info@caciquestraining.com</a></p>
+  </div>
+  <div class="footer-address">
+    <strong>📍 Location</strong><br>
+    5901 W. Linebaugh Ave<br>
+    Tampa, FL 33624<br>
+    United States<br>
+    <a href="https://maps.google.com/?q=5901+W+Linebaugh+Ave+Tampa+FL+33624" target="_blank" style="color:var(--gold);font-size:.72rem;margin-top:4px;display:inline-block;">Open in Google Maps →</a>
+  </div>
+  <div class="footer-address">
+    <strong>📞 Contact</strong><br>
+    <a href="tel:8139987941" style="color:rgba(255,255,255,.55);">(813) 998-7941</a><br>
+    <a href="sms:8139987941" style="color:var(--gold);margin-top:4px;display:inline-block;">💬 Send a Text</a><br>
+    <strong style="margin-top:10px;display:block;">🕐 Hours</strong>
+    Mon – Fri: 3:00 PM – 9:00 PM
+  </div>
+</footer>
+
+<!-- Google Map -->
+<div style="width:100%;height:280px;border-top:2px solid rgba(245,166,35,.15);">
+  <iframe
+    width="100%" height="100%"
+    style="border:0;display:block;"
+    loading="lazy"
+    allowfullscreen
+    referrerpolicy="no-referrer-when-downgrade"
+    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU3Kuo&q=5901+W+Linebaugh+Ave,Tampa,FL+33624">
+  </iframe>
+</div>
+
+<!-- Call/Text floating button -->
+<a href="tel:8139987941" class="contact-btn" title="Call or Text">📞</a>
+<div class="contact-tooltip">Call or text (813) 998-7941</div>
+<!-- ABOUT MODAL -->
+<div class="modal-overlay" id="aboutModal" onclick="if(event.target===this)closeAbout()">
+  <div class="modal-box">
+    <div class="modal-close">
+      <button onclick="closeAbout()">✕ Close</button>
+    </div>
+    <div class="modal-inner">
+      <div class="modal-grid">
+        <!-- Left: visual card -->
+        <div>
+          <div style="background:linear-gradient(135deg,var(--green2),var(--green3));border:2px solid rgba(245,166,35,.25);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px;">
+            <div style="font-size:4rem;">⚾</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);letter-spacing:.1em;text-align:center;">Coach Alejandro</div>
+            <div style="font-size:.72rem;color:rgba(255,255,255,.4);letter-spacing:.12em;text-transform:uppercase;text-align:center;">Founder · Caciques Training LLC</div>
+            <div style="display:flex;flex-direction:column;gap:9px;width:100%;margin-top:10px;">
+              <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.22);border-radius:2px;padding:9px 13px;display:flex;align-items:center;gap:10px;">
+                <span>🇻🇪</span>
+                <div><div style="font-size:.68rem;font-weight:700;color:var(--gold);">Age 3</div><div style="font-size:.72rem;color:rgba(255,255,255,.5);">Started playing in Punto Fijo, Venezuela</div></div>
+              </div>
+              <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.22);border-radius:2px;padding:9px 13px;display:flex;align-items:center;gap:10px;">
+                <span>🏟️</span>
+                <div><div style="font-size:.68rem;font-weight:700;color:var(--gold);">Age 16</div><div style="font-size:.72rem;color:rgba(255,255,255,.5);">Pro season · Tiburones de La Guaira</div></div>
+              </div>
+              <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.22);border-radius:2px;padding:9px 13px;display:flex;align-items:center;gap:10px;">
+                <span>🎓</span>
+                <div><div style="font-size:.68rem;font-weight:700;color:var(--gold);">Age 18</div><div style="font-size:.72rem;color:rgba(255,255,255,.5);">Began coaching career in Venezuela</div></div>
+              </div>
+              <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.22);border-radius:2px;padding:9px 13px;display:flex;align-items:center;gap:10px;">
+                <span>🌎</span>
+                <div><div style="font-size:.68rem;font-weight:700;color:var(--gold);">Today</div><div style="font-size:.72rem;color:rgba(255,255,255,.5);">Founder of Caciques Training LLC · USA</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: story -->
+        <div>
+          <div style="font-size:.65rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,166,35,.6);margin-bottom:10px;">Meet Your Coach</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.4rem);color:var(--white);letter-spacing:.03em;line-height:.95;margin-bottom:22px;">Built by a Player.<em style="font-style:normal;color:var(--gold);display:block;">Built for Players.</em></div>
+
+          <p style="font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.78;font-weight:300;margin-bottom:16px;">
+            Coach Alejandro grew up in Punto Fijo, Venezuela, where baseball wasn't just a sport — it was a way of life. He started playing at just 3 years old, and by age 10 was training every single day with one goal in mind: professional baseball.
+          </p>
+          <p style="font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.78;font-weight:300;margin-bottom:16px;">
+            At 12, he left home to join a baseball academy in another state, fully committed to his dream. That dedication paid off — at just 16 years old, he played a professional season with <strong style="color:var(--gold);">Los Tiburones de La Guaira</strong> in Venezuela's professional league. Throughout his career he received multiple offers from professional teams, a testament to the talent he built through relentless work.
+          </p>
+          <p style="font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.78;font-weight:300;margin-bottom:28px;">
+            After retiring at 18, Alejandro channeled everything into coaching — building his career from Punto Fijo to Valencia to Aruba, and working with professional players including MLB athletes. Today he brings that world-class experience to every session at Caciques Training LLC.
+          </p>
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;">
+            <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);color:var(--gold);font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:2px;">🏟️ Pro Player — Venezuela</div>
+            <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);color:var(--gold);font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:2px;">🎓 8+ Years Coaching</div>
+            <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);color:var(--gold);font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:2px;">🌎 Venezuela · Aruba · USA</div>
+            <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);color:var(--gold);font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:2px;">⭐ Worked with MLB Players</div>
+            <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);color:var(--gold);font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:2px;">⚾ All Ages & Levels</div>
+          </div>
+
+          <button onclick="closeAbout();document.getElementById('book').scrollIntoView({behavior:'smooth'});" class="btn-primary">Train with Coach Alejandro →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end mainSite -->
+
+<!-- ══ ADMIN LOGIN ══════════════════════════════════════════════ -->
+<div class="admin-login-screen" id="loginScreen">
+  <div class="login-box">
+    <div style="font-size:2.2rem;margin-bottom:10px;">⚾</div>
+    <h2>Coach Login</h2>
+    <p>Caciques Training LLC</p>
+    <input type="text" id="aUser" placeholder="Username"/>
+    <input type="password" id="aPass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div class="login-err" id="loginErr">Incorrect credentials.</div>
+    <button class="btn-primary" style="width:100%;" onclick="doLogin()">Login →</button>
+    <button class="btn-back" onclick="hideLogin()">← Back to site</button>
+  </div>
+</div>
+
+<!-- ══ ADMIN PANEL ══════════════════════════════════════════════ -->
+<div class="admin-panel" id="adminPanel">
+  <div class="admin-wrap">
+    <div class="admin-hdr">
+      <div class="admin-title">⚾ Coach Dashboard</div>
+      <button class="btn-logout" onclick="doLogout()">Logout</button>
+    </div>
+
+    <!-- VIP Secret Link -->
+    <div class="vip-link-box">
+      <span style="font-size:1.4rem;">🏆</span>
+      <div>
+        <div class="vip-link-label">VIP Private Lesson Link</div>
+        <div style="font-size:.75rem;color:var(--gray);margin-top:2px;">Share this link ONLY with your current VIP clients. It's not visible anywhere on the public site.</div>
+      </div>
+      <div class="vip-link-url" id="vipLinkDisplay">caciques-vip.html</div>
+      <button class="btn-copy" onclick="copyVipLink()">📋 Copy Link</button>
+    </div>
+
+    <!-- Schedule -->
+    <div class="panel">
+      <div class="panel-title">📅 Weekly Schedule — Mon to Fri, 3PM–9PM</div>
+      <div id="schedRows"></div>
+      <div class="add-form">
+        <select id="addDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select>
+        <select id="addTime">
+          <option>3:00 PM</option><option>3:30 PM</option><option>4:00 PM</option><option>4:30 PM</option>
+          <option>5:00 PM</option><option>5:30 PM</option><option>6:00 PM</option><option>6:30 PM</option>
+          <option>7:00 PM</option><option>7:30 PM</option><option>8:00 PM</option><option>8:30 PM</option>
+        </select>
+        <select id="addType">
+          <option value="group">Group Session (max 3)</option>
+          <option value="batting">Batting</option>
+          <option value="fielding">Fielding</option>
+          <option value="catcher">Catcher Lessons</option>
+          <option value="vip">VIP Only</option>
+        </select>
+        <button class="btn-add" onclick="addSlot()">+ Add Slot</button>
+      </div>
+    </div>
+
+    <!-- Bookings -->
+    <div class="panel">
+      <div class="panel-title">📋 Booking Requests</div>
+      <div class="filters">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('pending',this)">⏳ Pending</button>
+        <button class="filter-btn" onclick="setFilter('confirmed',this)">✓ Confirmed</button>
+        <button class="filter-btn" onclick="setFilter('vip',this)">🏆 VIP</button>
+      </div>
+      <div id="bookingsList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADMIN_USER='alejandro', ADMIN_PASS='Caciques2025';
+let currentFilter='all', nextId=3;
+
+let schedule={
+  Monday:   [{time:'4:00 PM',type:'group',spots:10},{time:'5:30 PM',type:'group',spots:10},{time:'7:00 PM',type:'vip',spots:1}],
+  Tuesday:  [{time:'4:00 PM',type:'group',spots:10},{time:'6:00 PM',type:'batting',spots:1}],
+  Wednesday:[{time:'4:00 PM',type:'group',spots:10},{time:'5:30 PM',type:'group',spots:10},{time:'7:30 PM',type:'vip',spots:1}],
+  Thursday: [{time:'4:00 PM',type:'group',spots:10},{time:'6:00 PM',type:'fielding',spots:1}],
+  Friday:   [{time:'4:00 PM',type:'group',spots:10},{time:'5:30 PM',type:'group',spots:10},{time:'7:00 PM',type:'vip',spots:1}],
+};
+
+let bookings=[
+  {id:1,name:'Carlos Gómez',age:11,contact:'María Gómez',phone:'(305)555-0101',email:'mgomez@email.com',type:'Group Session',level:'Beginner',positions:'Infield',day:'Monday',time:'4:00 PM',payment:'Zelle',notes:'Fielding fundamentals',status:'pending',isVip:false},
+  {id:2,name:'Ana Pérez',age:10,contact:'Sofia Pérez',phone:'(954)555-0303',email:'sperez@email.com',type:'Group Session',level:'Beginner',positions:'Batter/DH',day:'Wednesday',time:'4:00 PM',payment:'Venmo',notes:'',status:'confirmed',isVip:false},
+];
+
+// Slots
+document.querySelectorAll('input[name="stype"]').forEach(r=>r.addEventListener('change',()=>{if(document.getElementById('pDate').value)loadSlots();}));
+
+function loadSlots(){
+  const dv=document.getElementById('pDate').value;
+  if(!dv){alert('Please select a date first.');return;}
+  const d=new Date(dv+'T12:00:00');
+  const dayName=d.toLocaleDateString('en-US',{weekday:'long'});
+  const daySlots=schedule[dayName];
+  if(!daySlots||!daySlots.length){
+    document.getElementById('slotWrap').style.display='block';
+    document.getElementById('slotGrid').innerHTML='<p style="color:rgba(255,255,255,.38);font-size:.82rem;">No slots on this day. Please choose Mon–Fri.</p>';
+    return;
+  }
+  const bookedMap={};
+  bookings.forEach(b=>{if(b.day===dayName&&b.status!=='declined')bookedMap[b.time]=(bookedMap[b.time]||0)+1;});
+
+  // Filter out VIP slots from public view
+  const publicSlots=daySlots.filter(s=>s.type!=='vip');
+
+  let html='';
+  publicSlots.forEach(s=>{
+    const booked=bookedMap[s.time]||0;
+    const rem=s.spots-booked;
+    const full=rem<=0;
+    const typeLabels={batting:'Batting',fielding:'Fielding',catcher:'Catcher'};
+    const label=typeLabels[s.type]?typeLabels[s.type]:`${rem} spot${rem!==1?'s':''} left`;
+    const sid=`sl_${s.time.replace(/[\s:]/g,'_')}`;
+    html+=`<div class="slot-opt${full?' is-full':''}"><input type="radio" name="slot" id="${sid}" value="${s.time}" ${full?'disabled':''}><label for="${sid}"><span class="slot-time">${s.time}</span><span class="slot-spots">${full?'Full':label}</span></label></div>`;
+  });
+  document.getElementById('slotGrid').innerHTML=html||'<p style="color:rgba(255,255,255,.38);font-size:.82rem;">No slots available this day.</p>';
+  document.getElementById('slotWrap').style.display='block';
+  document.getElementById('slotWrap').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function submitBooking(){
+  const req=[{id:'pName',l:'Player Name'},{id:'pAge',l:'Age'},{id:'pContact',l:'Contact'},{id:'pPhone',l:'Phone'},{id:'pEmail',l:'Email'},{id:'pDate',l:'Date'}];
+  for(const f of req){const el=document.getElementById(f.id);if(!el.value.trim()){el.focus();el.style.borderColor='#e74c3c';setTimeout(()=>el.style.borderColor='',2000);alert('Please fill in: '+f.l);return;}}
+  const pos=[...document.querySelectorAll('.chip input[type=checkbox]:checked')].map(i=>i.value);
+  if(!pos.length){alert('Please select at least one position.');return;}
+  const slotEl=document.querySelector('input[name="slot"]:checked');
+  if(!slotEl){alert('Please pick an available time slot.');return;}
+
+  const stype=document.querySelector('input[name="stype"]:checked').value;
+  const level=document.querySelector('input[name="level"]:checked').value;
+  const pay=document.querySelector('input[name="pay"]:checked').value;
+  const d=new Date(document.getElementById('pDate').value+'T12:00:00');
+  const dayName=d.toLocaleDateString('en-US',{weekday:'long'});
+  const dateStr=d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  const b={id:nextId++,name:document.getElementById('pName').value,age:document.getElementById('pAge').value,contact:document.getElementById('pContact').value,phone:document.getElementById('pPhone').value,email:document.getElementById('pEmail').value,type:stype,level,positions:pos.join(', '),day:dayName,time:slotEl.value,payment:pay,notes:document.getElementById('pNotes').value,status:'pending',isVip:false,dateStr};
+  bookings.push(b);
+
+  document.getElementById('successDetail').innerHTML=`<strong>Session:</strong> ${stype}<br><strong>Player:</strong> ${b.name}, Age ${b.age}<br><strong>Level:</strong> ${level} · ${b.positions}<br><strong>Date:</strong> ${dateStr}<br><strong>Time:</strong> ${slotEl.value}<br><strong>Payment:</strong> ${pay}<br><strong>Contact:</strong> ${b.phone}`;
+  document.getElementById('bookForm').style.display='none';
+  const ss=document.getElementById('successScreen');ss.style.display='flex';ss.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function resetForm(){
+  document.getElementById('bookForm').style.display='block';
+  document.getElementById('successScreen').style.display='none';
+  document.querySelectorAll('#bookForm input[type=text],#bookForm input[type=email],#bookForm input[type=tel],#bookForm input[type=number],#bookForm input[type=date],#bookForm textarea').forEach(e=>e.value='');
+  document.querySelectorAll('.chip input[type=checkbox]').forEach(c=>c.checked=false);
+  document.getElementById('st1').checked=true;document.getElementById('lv1').checked=true;document.getElementById('py1').checked=true;
+  document.getElementById('slotWrap').style.display='none';
+  document.getElementById('book').scrollIntoView({behavior:'smooth'});
+}
+
+// Admin
+function showLogin(e){e.preventDefault();document.getElementById('loginScreen').style.display='flex';}
+function hideLogin(){document.getElementById('loginScreen').style.display='none';}
+function doLogin(){
+  if(document.getElementById('aUser').value===ADMIN_USER&&document.getElementById('aPass').value===ADMIN_PASS){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminPanel').style.display='block';
+    document.getElementById('mainSite').style.display='none';
+    renderSchedule();renderBookings();
+  } else {
+    document.getElementById('loginErr').style.display='block';
+    document.getElementById('aPass').value='';
+    setTimeout(()=>document.getElementById('loginErr').style.display='none',2500);
+  }
+}
+function doLogout(){document.getElementById('adminPanel').style.display='none';document.getElementById('mainSite').style.display='block';}
+
+function copyVipLink(){
+  navigator.clipboard.writeText('caciques-vip.html').then(()=>{
+    const btn=document.querySelector('.btn-copy');
+    btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent='📋 Copy Link',2000);
+  });
+}
+
+// Schedule
+function renderSchedule(){
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  document.getElementById('schedRows').innerHTML=days.map(day=>{
+    const slots=schedule[day]||[];
+    const tags=slots.map((s,i)=>{
+      const typeMap={group:`Group(${s.spots})`,batting:'Batting',fielding:'Fielding',catcher:'Catcher',vip:'🏆 VIP'};
+      const lbl=typeMap[s.type]||s.type;
+      const cls=s.type==='vip'?' is-vip':'';
+      return `<div class="slot-tag${cls}" onclick="removeSlot('${day}',${i})" title="Click to remove">${s.time} · ${lbl} <span class="x">✕</span></div>`;
+    }).join('');
+    return `<div class="day-row"><div class="day-name">${day}</div><div class="slots-row">${tags||'<span style="font-size:.78rem;color:var(--gray);">No slots</span>'}</div></div>`;
+  }).join('');
+}
+
+function addSlot(){
+  const day=document.getElementById('addDay').value;
+  const time=document.getElementById('addTime').value;
+  const type=document.getElementById('addType').value;
+  if(!schedule[day])schedule[day]=[];
+  if(schedule[day].find(s=>s.time===time)){alert('Slot already exists for '+day+' at '+time);return;}
+  schedule[day].push({time,type,spots:type==='group'?3:1});
+  schedule[day].sort((a,b)=>a.time.localeCompare(b.time));
+}
+function removeSlot(day,idx){if(!confirm('Remove this slot?'))return;schedule[day].splice(idx,1);renderSchedule();}
+
+// Bookings
+function setFilter(f,btn){currentFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBookings();}
+function renderBookings(){
+  let list=bookings;
+  if(currentFilter==='pending')list=bookings.filter(b=>b.status==='pending');
+  else if(currentFilter==='confirmed')list=bookings.filter(b=>b.status==='confirmed');
+  else if(currentFilter==='vip')list=bookings.filter(b=>b.isVip);
+  if(!list.length){document.getElementById('bookingsList').innerHTML='<div class="empty">No bookings to show.</div>';return;}
+  list=[...list].sort((a,b)=>a.status==='pending'?-1:1);
+  const smap={pending:'<span class="bc-status s-pending">⏳ Pending</span>',confirmed:'<span class="bc-status s-confirmed">✓ Confirmed</span>',declined:'<span class="bc-status s-declined">✕ Declined</span>'};
+  document.getElementById('bookingsList').innerHTML=list.map(b=>{
+    const vipBadge=b.isVip?'<span class="bc-status s-vip">🏆 VIP</span>':'';
+    const actions=b.status==='pending'
+      ?`<button class="btn-confirm" onclick="confirmB(${b.id})">✓ Confirm</button><button class="btn-decline" onclick="declineB(${b.id})">✕ Decline</button><button class="btn-text" onclick="textClient(${b.id})">📲 Text to Reschedule</button>`
+      :b.status==='confirmed'
+      ?`<button class="btn-decline" onclick="declineB(${b.id})">✕ Cancel</button><button class="btn-text" onclick="textClient(${b.id})">📲 Text Client</button>`
+      :`<button class="btn-confirm" onclick="confirmB(${b.id})">↩ Restore</button>`;
+    const cls=`bcard${b.isVip?' is-vip':''}${b.status==='confirmed'?' is-confirmed':''}${b.status==='declined'?' is-declined':''}`;
+    return `<div class="${cls}"><div><div class="bc-name">${b.name} ${vipBadge}</div><div class="bc-meta"><strong>Type:</strong> ${b.type} · <strong>${b.day}</strong> @ ${b.time}<br><strong>Age:</strong> ${b.age} · <strong>Level:</strong> ${b.level} · <strong>Pos:</strong> ${b.positions}<br><strong>Contact:</strong> ${b.contact} · ${b.phone}<br><strong>Email:</strong> ${b.email} · <strong>Pay:</strong> ${b.payment}${b.notes?` · <strong>Notes:</strong> ${b.notes}`:''}</div><div class="bc-actions">${actions}</div></div><div>${smap[b.status]||''}</div></div>`;
+  }).join('');
+}
+function confirmB(id){const b=bookings.find(x=>x.id===id);if(b){b.status='confirmed';renderBookings();}}
+function declineB(id){if(!confirm('Decline/cancel this booking?'))return;const b=bookings.find(x=>x.id===id);if(b){b.status='declined';renderBookings();}}
+function textClient(id){
+  const b=bookings.find(x=>x.id===id);if(!b)return;
+  const msg=encodeURIComponent(`Hi ${b.contact}! Coach Alejandro from Caciques Training here. I'd like to discuss ${b.name}'s booking on ${b.day} at ${b.time}. Can we find a time that works better?`);
+  window.open(`sms:${b.phone.replace(/\D/g,'')}?body=${msg}`,'_blank');
+}
+
+document.getElementById('pDate').min=new Date().toISOString().split('T')[0];
+
+function openAbout(){
+  document.getElementById('aboutModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeAbout(){
+  document.getElementById('aboutModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAbout();});
+</script>
+</body>
+</html>
