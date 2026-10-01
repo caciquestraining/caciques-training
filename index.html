@@ -1028,8 +1028,9 @@ function loadSlots(){
   bookings.forEach(b=>{
     if(b.day===dayName&&b.status!=='declined'){
       bookedMap[b.time]=(bookedMap[b.time]||0)+(b.players||1);
-      // If 2+ players, session is 1 hour — block next 30-min slot too
-      if((b.players||1)>1)blockedNext.add(b.time);
+      // Block next slot if 2+ players OR batting+fielding (1 hour session)
+      const isLong=(b.players||1)>1||(b.type&&b.type.toLowerCase().includes('batting')&&b.type.toLowerCase().includes('fielding'));
+      if(isLong)blockedNext.add(b.time);
     }
   });
 
@@ -1256,6 +1257,7 @@ function renderSchedule(){
             <span class="x" onclick="removeSlot('${day}',${i});event.stopPropagation()">✕</span>
           </span>
         </div>
+        ${slotBookings.length>0?`<div style="font-size:.68rem;color:rgba(255,255,255,.5);margin-top:3px;">${[...new Set(slotBookings.map(b=>b.type))].join(' · ')}</div>`:''}
         ${playersList?`<div style="font-size:.7rem;color:rgba(255,255,255,.7);margin-top:5px;line-height:1.6;">${playersList}</div>`:''}
       </div>`;
     }).join('');
@@ -1287,7 +1289,7 @@ function renderBookings(){
   document.getElementById('bookingsList').innerHTML=list.map(b=>{
     const vipBadge=b.isVip?'<span class="bc-status s-vip">🏆 VIP</span>':'';
     const actions=b.status==='pending'
-      ?`<button class="btn-confirm" onclick="confirmB(${b.id})">✓ Confirm</button><button class="btn-decline" onclick="declineB(${b.id})">✕ Decline</button><button class="btn-text" onclick="textClient(${b.id})">📲 Text to Reschedule</button>`
+      ?`<button class="btn-confirm" onclick="confirmB(${b.id})">✓ Confirm</button><button class="btn-decline" onclick="declineB(${b.id})">✕ Decline</button><button class="btn-text" onclick="rescheduleB(${b.id})">📅 Reschedule</button>`
       :b.status==='confirmed'
       ?`<button class="btn-decline" onclick="declineB(${b.id})">✕ Cancel</button><button class="btn-text" onclick="rescheduleB(${b.id})">📅 Reschedule</button>`
       :`<button class="btn-confirm" onclick="confirmB(${b.id})">↩ Restore</button>`;
@@ -1377,7 +1379,7 @@ async function confirmB(id){
   if(!b) return;
 
   if(b.payment==='Card' && b.stripePaymentMethodId){
-    const PRICES={batting:60,fielding:60,catcher:60,'batting+fielding':100,'4-session':200,vip:60};
+    const PRICES={'Batting':60,'Fielding':60,'Catcher Lessons':60,'Group Session':60,'Batting + Fielding Package':100,'4-Session Pack':200,'VIP Private Lesson':60};
     const basePrice=PRICES[b.type]||60;
     const players=b.players||1;
     const disc=players===3?0.83:players===2?0.90:1;
