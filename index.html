@@ -1575,7 +1575,11 @@ function renderWeeklySummary() {
       <div style="font-size:.7rem;color:var(--gray);font-weight:600;letter-spacing:.06em;text-transform:uppercase;">${label}</div>
     </div>`;
 
+  const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const weekLabel = `${fmt(weekStart)} — ${fmt(weekEnd)}, ${weekEnd.getFullYear()}`;
+
   el.innerHTML =
+    `<div style="grid-column:1/-1;font-size:.78rem;font-weight:700;color:var(--gray);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">Week of ${weekLabel}</div>` +
     card('📅', 'Sessions This Week', totalSessions, 'var(--green)') +
     card('⚾', 'Total Players', totalPlayers, 'var(--green2)') +
     card('💰', 'Total Revenue', '$' + Math.round(totalRevenue), 'var(--gold)') +
