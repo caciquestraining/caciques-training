@@ -817,6 +817,12 @@ footer a{color:var(--gold);text-decoration:none;font-size:.78rem;font-weight:500
 
 
 
+    <!-- Weekly Summary -->
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-title">📊 Weekly Summary</div>
+      <div id="weeklySummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:12px;"></div>
+    </div>
+
     <!-- Schedule -->
     <div class="panel">
       <div class="panel-title">📅 Weekly Schedule — Mon to Fri, 3PM–9PM</div>
@@ -1210,7 +1216,11 @@ function copyVipLink(){
 
 // Schedule
 function renderSchedule(){
-  const days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  // Only show bookings from today onwards
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
   document.getElementById('schedRows').innerHTML=days.map(day=>{
     const slots=schedule[day]||[];
     const tags=slots.map((s,i)=>{
@@ -1218,8 +1228,15 @@ function renderSchedule(){
       const lbl=typeMap[s.type]||s.type;
       const cls=s.type==='vip'?' is-vip':'';
 
-      // Get bookings for this slot
-      const slotBookings=bookings.filter(b=>b.day===day&&b.time===s.time&&b.status!=='declined');
+      // Get bookings for this slot — only current and future
+      const slotBookings=bookings.filter(b=>{
+        if(b.day!==day||b.time!==s.time||b.status==='declined') return false;
+        if(b.dateStr){
+          const bDate=new Date(b.dateStr);
+          if(!isNaN(bDate)){bDate.setHours(0,0,0,0);return bDate>=today;}
+        }
+        return true;
+      });
       const confirmedBookings=slotBookings.filter(b=>b.status==='confirmed');
       const pendingBookings=slotBookings.filter(b=>b.status==='pending');
       const count=slotBookings.reduce((sum,b)=>sum+(b.players||1),0);
@@ -1279,6 +1296,7 @@ function removeSlot(day,idx){if(!confirm('Remove this slot?'))return;schedule[da
 // Bookings
 function setFilter(f,btn){currentFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBookings();}
 function renderBookings(){
+  renderWeeklySummary();
   let list=bookings;
   if(currentFilter==='pending')list=bookings.filter(b=>b.status==='pending');
   else if(currentFilter==='confirmed')list=bookings.filter(b=>b.status==='confirmed');
@@ -1366,7 +1384,7 @@ function sendEmail(b, status){
     status_color: isConfirmed ? '#22c55e' : '#e74c3c',
     status_message: isConfirmed ? '✅ Your session has been confirmed!' : '❌ Your booking was not confirmed',
     email_body: isConfirmed
-      ? `Great news! Your booking for ${b.name} has been confirmed. To secure your slot, please send payment within 24 hours:\n\n💵 Cash — pay at the session\n📲 Zelle — (813) 998-7941\n💙 Venmo — @caciqueriera\n\nAmount due: $${PRICES[b.type]||60}\n\n📋 Cancellation Policy: Cancellations with 24+ hours notice can be rebooked within the same week. Same-day cancellations forfeit the session. Please arrive 5 minutes early and bring water and appropriate gear.`
+      ? `Great news! Your booking for ${b.name} has been confirmed!\n\nPayment: ${b.payment==='Card'?'Your card on file will be charged $'+(PRICES[b.type]||60):'Please bring $'+(PRICES[b.type]||60)+' cash to the session.'}\n\n📋 Cancellation Policy: Cancellations with 24+ hours notice can be rebooked. Same-day cancellations forfeit the session. Please arrive 5 minutes early and bring water and appropriate gear.`
       : `Unfortunately we were unable to confirm this booking at this time. Coach Alejandro will reach out to you directly to find a time that works better for the group. Thank you for your understanding!`,
   };
   emailjs.send('service_idve8mt', 'template_egww4eo', params)
@@ -1518,6 +1536,51 @@ if(isIOS && !isStandalone && !localStorage.getItem('installDismissed')){
       </div>`;
     document.getElementById('installBanner').classList.add('show');
   }, 3000);
+}
+
+
+// ── WEEKLY SUMMARY ─────────────────────────────────────────
+function renderWeeklySummary() {
+  const el = document.getElementById('weeklySummary');
+  if (!el) return;
+
+  // Get start and end of current week (Mon-Sun)
+  const now = new Date();
+  const day = now.getDay();
+  const diffToMon = (day === 0 ? -6 : 1 - day);
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() + diffToMon);
+  weekStart.setHours(0,0,0,0);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  weekEnd.setHours(23,59,59,999);
+
+  const thisWeek = bookings.filter(b => {
+    if (b.status !== 'confirmed') return false;
+    if (!b.dateStr) return false;
+    const d = new Date(b.dateStr);
+    return !isNaN(d) && d >= weekStart && d <= weekEnd;
+  });
+
+  const totalSessions = thisWeek.length;
+  const totalPlayers = thisWeek.reduce((sum,b) => sum + (b.players||1), 0);
+  const totalRevenue = thisWeek.reduce((sum,b) => sum + (PRICES[b.type]||60) * (b.players||1) * (b.players===3?0.83:b.players===2?0.90:1), 0);
+  const cashRevenue = thisWeek.filter(b=>b.payment==='Cash').reduce((sum,b) => sum + (PRICES[b.type]||60) * (b.players||1) * (b.players===3?0.83:b.players===2?0.90:1), 0);
+  const cardRevenue = thisWeek.filter(b=>b.payment==='Card').reduce((sum,b) => sum + (PRICES[b.type]||60) * (b.players||1) * (b.players===3?0.83:b.players===2?0.90:1), 0);
+
+  const card = (icon, label, value, color='var(--green)') =>
+    `<div style="background:var(--light);border-radius:4px;padding:14px 16px;border-left:3px solid ${color};">
+      <div style="font-size:1.1rem;">${icon}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:${color};margin-top:2px;">${value}</div>
+      <div style="font-size:.7rem;color:var(--gray);font-weight:600;letter-spacing:.06em;text-transform:uppercase;">${label}</div>
+    </div>`;
+
+  el.innerHTML =
+    card('📅', 'Sessions This Week', totalSessions, 'var(--green)') +
+    card('⚾', 'Total Players', totalPlayers, 'var(--green2)') +
+    card('💰', 'Total Revenue', '$' + Math.round(totalRevenue), 'var(--gold)') +
+    card('💵', 'Cash', '$' + Math.round(cashRevenue), '#2ecc71') +
+    card('💳', 'Card', '$' + Math.round(cardRevenue), '#3498db');
 }
 
 // ── RESCHEDULE ─────────────────────────────────────────────
