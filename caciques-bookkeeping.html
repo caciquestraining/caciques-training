@@ -306,6 +306,7 @@ function doLogin(){
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
     init();
+    loadBookingsFromFirebase();
   } else {
     const err = document.getElementById('loginErr');
     err.textContent = 'Incorrect credentials. Try again.';
@@ -332,16 +333,30 @@ const PRICES = {
 };
 
 // Sample bookings (in real use these come from the main site)
-let bookings = [
-  {id:1, name:'Carlos Gómez', type:'Group Session', day:'Monday', date:'2025-04-21', payment:'Zelle', status:'confirmed'},
-  {id:2, name:'Ana Pérez', type:'Batting', day:'Wednesday', date:'2025-04-23', payment:'Venmo', status:'confirmed'},
-  {id:3, name:'Luis Torres', type:'Fielding', day:'Thursday', date:'2025-04-24', payment:'Cash', status:'confirmed'},
-  {id:4, name:'Diego Martínez', type:'Batting + Fielding Package', day:'Friday', date:'2025-04-25', payment:'Zelle', status:'confirmed'},
-  {id:5, name:'Sofia Ramírez', type:'Catcher Lessons', day:'Monday', date:'2025-04-14', payment:'Cash', status:'confirmed'},
-  {id:6, name:'Miguel Torres', type:'Group Session', day:'Tuesday', date:'2025-04-15', payment:'Venmo', status:'confirmed'},
-  {id:7, name:'Carmen Vega', type:'Batting', day:'Wednesday', date:'2025-04-09', payment:'Zelle', status:'confirmed'},
-  {id:8, name:'Rafael Peña', type:'4-Session Pack', day:'Monday', date:'2025-04-07', payment:'Zelle', status:'confirmed'},
-];
+let bookings = [];
+
+async function loadBookingsFromFirebase() {
+  try {
+    const snap = await firebase.firestore().collection('bookings').get();
+    bookings = [];
+    snap.forEach(doc => {
+      const b = doc.data();
+      if (b.status === 'confirmed') {
+        // Convert dateStr to date field
+        let date = b.date || '';
+        if (!date && b.dateStr) {
+          const d = new Date(b.dateStr);
+          if (!isNaN(d)) date = d.toISOString().split('T')[0];
+        }
+        bookings.push({...b, date});
+      }
+    });
+    renderAll();
+  } catch(err) {
+    console.error('Firebase error:', err);
+    renderAll();
+  }
+}
 
 let expenses = [
   {id:1, date:'2025-04-20', category:'Equipment', desc:'Baseballs (12 pack)', amount:45.99},
