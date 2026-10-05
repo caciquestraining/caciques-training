@@ -1268,7 +1268,7 @@ function renderSchedule(){
 
       return `<div class="slot-tag${cls}" style="display:block;padding:8px 10px;">
         <div style="display:flex;align-items:center;justify-content:space-between;">
-          <span>${s.time} · ${lbl}</span>
+          <span style="color:var(--green);font-weight:700;">${s.time} · ${lbl}</span>
           <span style="display:flex;align-items:center;gap:6px;">
             <span style="background:${badgeColor};color:white;font-size:.6rem;padding:2px 7px;border-radius:10px;">${count} player${count!==1?'s':''}</span>
             <span class="x" onclick="removeSlot('${day}',${i});event.stopPropagation()">✕</span>
@@ -1302,7 +1302,18 @@ function renderBookings(){
   else if(currentFilter==='confirmed')list=bookings.filter(b=>b.status==='confirmed');
   else if(currentFilter==='vip')list=bookings.filter(b=>b.isVip);
   if(!list.length){document.getElementById('bookingsList').innerHTML='<div class="empty">No bookings to show.</div>';return;}
-  list=[...list].sort((a,b)=>a.status==='pending'?-1:1);
+  list=[...list].sort((a,b)=>{
+    // Pending first
+    if(a.status==='pending'&&b.status!=='pending') return -1;
+    if(a.status!=='pending'&&b.status==='pending') return 1;
+    // Confirmed — sort by date ascending
+    if(a.status==='confirmed'&&b.status==='confirmed'){
+      const da=new Date(a.dateStr||'9999-12-31');
+      const db2=new Date(b.dateStr||'9999-12-31');
+      return da-db2;
+    }
+    return 0;
+  });
   const smap={pending:'<span class="bc-status s-pending">⏳ Pending</span>',confirmed:'<span class="bc-status s-confirmed">✓ Confirmed</span>',declined:'<span class="bc-status s-declined">✕ Declined</span>'};
   document.getElementById('bookingsList').innerHTML=list.map(b=>{
     const vipBadge=b.isVip?'<span class="bc-status s-vip">🏆 VIP</span>':'';
