@@ -1639,9 +1639,15 @@ async function autoRefreshPanel() {
   if (document.getElementById('adminPanel').style.display !== 'block') return;
   try {
     const snap = await window.db.collection('bookings').get();
-    if (lastBookingCount >= 0 && snap.size !== lastBookingCount) {
-      bookings = [];
-      snap.forEach(doc => { bookings.push({...doc.data(), firebaseId: doc.id}); });
+    // Only reload if there are MORE bookings than before (new booking came in)
+    if (lastBookingCount >= 0 && snap.size > lastBookingCount) {
+      // Merge — only add new bookings, don't overwrite existing ones
+      const existingIds = new Set(bookings.map(b => b.firebaseId));
+      snap.forEach(doc => {
+        if (!existingIds.has(doc.id)) {
+          bookings.push({...doc.data(), firebaseId: doc.id});
+        }
+      });
       renderBookings(); renderSchedule();
       showToast('🔄 New booking received!');
     }
@@ -1649,7 +1655,7 @@ async function autoRefreshPanel() {
   } catch(err) { console.error('Auto-refresh error:', err); }
 }
 
-setInterval(autoRefreshPanel, 15000);
+setInterval(autoRefreshPanel, 30000);
 
 </script>
 
