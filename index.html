@@ -1380,8 +1380,13 @@ function saveToSheets(b, status){
   }).catch(err => console.error('Sheets error:', err));
 }
 
-function sendEmail(b, status){
+async function sendEmail(b, status){
   const isConfirmed = status === 'confirmed';
+  const basePrice = PRICES[b.type] || 60;
+  const players = b.players || 1;
+  const disc = players===3?0.83:players===2?0.90:1;
+  const amount = Math.round(basePrice * players * disc);
+  
   const params = {
     to_email: b.email,
     contact_name: b.contact || b.name,
@@ -1389,18 +1394,26 @@ function sendEmail(b, status){
     session_type: b.type,
     day: b.day,
     time: b.time,
-    amount: '$' + (PRICES[b.type] || 60),
+    amount: '$' + amount,
     payment: b.payment,
-    status: isConfirmed ? '✅ CONFIRMED' : '❌ DECLINED',
-    status_color: isConfirmed ? '#22c55e' : '#e74c3c',
     status_message: isConfirmed ? '✅ Your session has been confirmed!' : '❌ Your booking was not confirmed',
     email_body: isConfirmed
-      ? `Great news! Your booking for ${b.name} has been confirmed!\n\nPayment: ${b.payment==='Card'?'Your card on file will be charged $'+(PRICES[b.type]||60):'Please bring $'+(PRICES[b.type]||60)+' cash to the session.'}\n\n📋 Cancellation Policy: Cancellations with 24+ hours notice can be rebooked. Same-day cancellations forfeit the session. Please arrive 5 minutes early and bring water and appropriate gear.`
-      : `Unfortunately we were unable to confirm this booking at this time. Coach Alejandro will reach out to you directly to find a time that works better for the group. Thank you for your understanding!`,
+      ? `Great news! Your booking for ${b.name} has been confirmed!\n\nPayment: ${b.payment==='Card'?'Your card on file will be charged $'+amount:'Please bring $'+amount+' cash to the session.'}\n\n📋 Cancellation Policy: Cancellations with 24+ hours notice can be rebooked. Same-day cancellations forfeit the session. Please arrive 5 minutes early and bring water and appropriate gear.`
+      : `Unfortunately we were unable to confirm this booking at this time. Coach Alejandro will reach out to you directly to find a time that works better. Thank you for your understanding!`,
   };
-  emailjs.send('service_idve8mt', 'template_egww4eo', params)
-    .then(() => console.log('Email sent to ' + b.email))
-    .catch(err => console.error('Email error:', err));
+
+  try {
+    const res = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(params)
+    });
+    const data = await res.json();
+    if (data.success) console.log('Email sent to ' + b.email);
+    else console.error('Email error:', data.error);
+  } catch(err) {
+    console.error('Email error:', err);
+  }
 }
 
 async function confirmB(id){
