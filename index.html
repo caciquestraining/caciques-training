@@ -1274,8 +1274,8 @@ function renderSchedule(){
             <span class="x" onclick="removeSlot('${day}',${i});event.stopPropagation()">✕</span>
           </span>
         </div>
-        ${slotBookings.length>0?`<div style="font-size:.68rem;color:rgba(255,255,255,.5);margin-top:3px;">${[...new Set(slotBookings.map(b=>b.type))].join(' · ')}</div>`:''}
-        ${playersList?`<div style="font-size:.7rem;color:rgba(255,255,255,.7);margin-top:5px;line-height:1.6;">${playersList}</div>`:''}
+        ${slotBookings.length>0?`<div style="font-size:.68rem;color:rgba(255,255,255,.75);margin-top:3px;font-weight:600;">${[...new Set(slotBookings.map(b=>b.type))].join(' · ')}</div>`:''}
+        ${playersList?`<div style="font-size:.7rem;color:rgba(255,255,255,.95);margin-top:5px;line-height:1.6;font-weight:500;">${playersList}</div>`:''}
       </div>`;
     }).join('');
     return `<div class="day-row"><div class="day-name">${day}</div><div class="slots-row">${tags||'<span style="font-size:.78rem;color:var(--gray);">No slots</span>'}</div></div>`;
@@ -1326,7 +1326,7 @@ function renderBookings(){
     const cardInfo = b.stripeCard ? `<br><strong>💳 Card:</strong> ${b.stripeCard} <span style="color:#27ae60;font-size:.75rem;">✓ Saved</span>` : '';
     const packInfo = sessionPacks[b.id] ? `<br><strong>📦 Sessions:</strong> ${sessionPacks[b.id].remaining}/${sessionPacks[b.id].total} remaining <button onclick="useSession(${b.id})" style="margin-left:6px;background:var(--gold);color:var(--green3);border:none;border-radius:3px;padding:2px 8px;font-size:.72rem;font-weight:700;cursor:pointer;">Mark Session Used</button>` : '';
     const extraPlayersInfo=b.extraPlayers&&b.extraPlayers.length?b.extraPlayers.map((p,i)=>`<br><strong>Player ${i+2}:</strong> ${p.name}${p.age?', Age '+p.age:''}`).join(''):'';
-    return `<div class="${cls}"><div><div class="bc-name">${b.name} ${vipBadge}</div><div class="bc-meta"><strong>Type:</strong> ${b.type} · <strong>${b.day}</strong> @ ${b.time}<br><strong>Age:</strong> ${b.age} · <strong>Level:</strong> ${b.level} · <strong>Pos:</strong> ${b.positions}${extraPlayersInfo}<br><strong>Players:</strong> ${b.players||1}<br><strong>Contact:</strong> ${b.contact} · ${b.phone}<br><strong>Email:</strong> ${b.email} · <strong>Pay:</strong> ${b.payment}${cardInfo}${packInfo}${b.notes?`<br><strong>Notes:</strong> ${b.notes}`:''}</div><div class="bc-actions">${actions}</div></div><div>${smap[b.status]||''}</div></div>`;
+    return `<div class="${cls}"><div><div class="bc-name">${b.name} ${vipBadge}</div><div class="bc-meta"><strong>Type:</strong> ${b.type} · <strong>${b.day}</strong> @ ${b.time}${b.dateStr?` · <strong style='color:var(--gold);'>${new Date(b.dateStr).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</strong>`:''}<br><strong>Age:</strong> ${b.age} · <strong>Level:</strong> ${b.level} · <strong>Pos:</strong> ${b.positions}${extraPlayersInfo}<br><strong>Players:</strong> ${b.players||1}<br><strong>Contact:</strong> ${b.contact} · ${b.phone}<br><strong>Email:</strong> ${b.email} · <strong>Pay:</strong> ${b.payment}${cardInfo}${packInfo}${b.notes?`<br><strong>Notes:</strong> ${b.notes}`:''}</div><div class="bc-actions">${actions}</div></div><div>${smap[b.status]||''}</div></div>`;
   }).join('');
 }
 function useSession(id) {
