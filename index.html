@@ -1313,13 +1313,21 @@ function addSlot(){
 function removeSlot(day,idx){if(!confirm('Remove this slot?'))return;schedule[day].splice(idx,1);renderSchedule();}
 
 // Bookings
+function archiveB(id){
+  const b=bookings.find(x=>x.id===id);
+  if(!b)return;
+  b.archived=true;
+  updateBookingInFirebase(b);
+  renderBookings();
+  showToast('📁 Session archived');
+}
 function togglePastSessions(){const p=document.getElementById('pastSessionsPanel');if(p)p.style.display=p.style.display==='none'?'block':'none';}
 function setFilter(f,btn){currentFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBookings();}
 function renderBookings(){
   renderWeeklySummary();
   const todayStr=new Date().toISOString().split('T')[0];
   // Past = has old dateStr, OR confirmed/declined with no dateStr (legacy bookings without date)
-  const isPast=b=>b.status!=='pending' && (b.dateStr ? b.dateStr < todayStr : true);
+  const isPast=b=>b.archived || (b.status!=='pending' && (b.dateStr ? b.dateStr < todayStr : true));
   let allList=bookings;
   if(currentFilter==='pending')allList=bookings.filter(b=>b.status==='pending');
   else if(currentFilter==='confirmed')allList=bookings.filter(b=>b.status==='confirmed');
@@ -1348,7 +1356,7 @@ function renderBookings(){
     const actions=b.status==='pending'
       ?`<button class="btn-confirm" onclick="confirmB(${b.id})">✓ Confirm</button><button class="btn-decline" onclick="declineB(${b.id})">✕ Decline</button><button class="btn-text" onclick="rescheduleB(${b.id})">📅 Reschedule</button>${msgBtn}`
       :b.status==='confirmed'
-      ?`<button class="btn-decline" onclick="declineB(${b.id})">✕ Cancel</button><button class="btn-text" onclick="rescheduleB(${b.id})">📅 Reschedule</button>${msgBtn}`
+      ?`<button class="btn-decline" onclick="declineB(${b.id})">✕ Cancel</button><button class="btn-text" onclick="rescheduleB(${b.id})">📅 Reschedule</button><button class="btn-text" onclick="archiveB(${b.id})" style="opacity:.7;">📁 Archive</button>${msgBtn}`
       :`<button class="btn-confirm" onclick="confirmB(${b.id})">↩ Restore</button>${msgBtn}`;
     const cls=`bcard${b.isVip?' is-vip':''}${b.status==='confirmed'?' is-confirmed':''}${b.status==='declined'?' is-declined':''}`;
     const cardInfo = b.stripeCard ? `<br><strong>💳 Card:</strong> ${b.stripeCard} <span style="color:#27ae60;font-size:.75rem;">✓ Saved</span>` : '';
