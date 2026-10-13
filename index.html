@@ -811,11 +811,20 @@ footer a{color:var(--gold);text-decoration:none;font-size:.78rem;font-weight:500
       <div class="admin-title">⚾ Coach Dashboard</div>
       <div style="display:flex;gap:10px;align-items:center;">
         <a href="caciques-bookkeeping.html" target="_blank" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);color:var(--gold);font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 16px;border-radius:2px;text-decoration:none;">💰 Bookkeeping</a>
+        <button onclick="togglePastSessions()" id="pastBtn" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);color:var(--gold);font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 16px;border-radius:2px;cursor:pointer;">📁 Past Sessions</button>
         <button class="btn-logout" onclick="doLogout()">Logout</button>
       </div>
     </div>
 
 
+
+    <!-- Past Sessions Panel -->
+    <div id="pastSessionsPanel" style="display:none;margin-bottom:16px;">
+      <div class="panel">
+        <div class="panel-title">📁 Past Sessions</div>
+        <div id="pastSessionsList"></div>
+      </div>
+    </div>
 
     <!-- Weekly Summary -->
     <div class="panel" style="margin-bottom:16px;">
@@ -1304,6 +1313,7 @@ function addSlot(){
 function removeSlot(day,idx){if(!confirm('Remove this slot?'))return;schedule[day].splice(idx,1);renderSchedule();}
 
 // Bookings
+function togglePastSessions(){const p=document.getElementById('pastSessionsPanel');if(p)p.style.display=p.style.display==='none'?'block':'none';}
 function setFilter(f,btn){currentFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBookings();}
 function renderBookings(){
   renderWeeklySummary();
@@ -1347,10 +1357,12 @@ function renderBookings(){
     return `<div class="${cls}"><div><div class="bc-name">${b.name} ${vipBadge}</div><div class="bc-meta"><strong>Type:</strong> ${b.type} · <strong>${b.day}</strong> @ ${b.time}${b.dateStr?` · <strong style='color:var(--gold);'>${new Date(b.dateStr).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</strong>`:''}<br><strong>Age:</strong> ${b.age} · <strong>Level:</strong> ${b.level} · <strong>Pos:</strong> ${b.positions}${extraPlayersInfo}<br><strong>Players:</strong> ${b.players||1}<br><strong>Contact:</strong> ${b.contact} · ${b.phone}<br><strong>Email:</strong> ${b.email} · <strong>Pay:</strong> ${b.payment}${cardInfo}${packInfo}${b.notes?`<br><strong>Notes:</strong> ${b.notes}`:''}</div><div class="bc-actions">${actions}</div></div><div>${smap[b.status]||''}</div></div>`;
   };
   let html = list.length ? list.map(renderCard).join('') : '<div class="empty">No upcoming bookings.</div>';
-  if(pastList.length){
-    html += `<details style="margin-top:24px;"><summary style="cursor:pointer;font-weight:700;color:var(--gold);font-size:.9rem;padding:10px 0;border-top:1px solid rgba(255,255,255,.1);">📁 Past Sessions (${pastList.length})</summary><div style="margin-top:12px;opacity:.75;">${pastList.map(renderCard).join('')}</div></details>`;
-  }
   document.getElementById('bookingsList').innerHTML=html;
+  // Render past sessions in separate panel
+  const pastBtn=document.getElementById('pastBtn');
+  if(pastBtn) pastBtn.textContent=`📁 Past Sessions (${pastList.length})`;
+  const pastEl=document.getElementById('pastSessionsList');
+  if(pastEl) pastEl.innerHTML=pastList.length?`<div style="opacity:.8;">${pastList.map(renderCard).join('')}</div>`:'<div class="empty">No past sessions.</div>';
 }
 function useSession(id) {
   if (!sessionPacks[id]) return;
