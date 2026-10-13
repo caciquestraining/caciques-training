@@ -1321,6 +1321,18 @@ function archiveB(fid){
   renderBookings();
   showToast('📁 Session archived');
 }
+function deleteB(fid){
+  if(!confirm('Delete this booking permanently? This cannot be undone.'))return;
+  const idx=bookings.findIndex(x=>x.firebaseId===fid);
+  if(idx===-1)return;
+  const b=bookings[idx];
+  if(window.firebaseReady&&b.firebaseId){
+    window.db.collection('bookings').doc(b.firebaseId).delete().catch(e=>console.error(e));
+  }
+  bookings.splice(idx,1);
+  renderBookings();
+  showToast('🗑 Booking deleted');
+}
 function unarchiveB(fid){
   const b=bookings.find(x=>x.firebaseId===fid);
   if(!b)return;
@@ -1365,7 +1377,7 @@ function renderBookings(){
       ?`<button class="btn-confirm" onclick="confirmB('${b.firebaseId}')">✓ Confirm</button><button class="btn-decline" onclick="declineB('${b.firebaseId}')">✕ Decline</button><button class="btn-text" onclick="rescheduleB('${b.firebaseId}')">📅 Reschedule</button>${msgBtn}`
       :b.status==='confirmed'
       ?`<button class="btn-decline" onclick="declineB('${b.firebaseId}')">✕ Cancel</button><button class="btn-text" onclick="rescheduleB('${b.firebaseId}')">📅 Reschedule</button><button class="btn-text" onclick="archiveB('${b.firebaseId}')" style="opacity:.7;">📁 Archive</button>${msgBtn}`
-      :`<button class="btn-confirm" onclick="confirmB('${b.firebaseId}')">↩ Restore</button><button class="btn-text" onclick="unarchiveB('${b.firebaseId}')" style="opacity:.7;">↩ Unarchive</button>${msgBtn}`;
+      :`<button class="btn-confirm" onclick="confirmB('${b.firebaseId}')">↩ Restore</button><button class="btn-text" onclick="unarchiveB('${b.firebaseId}')" style="opacity:.7;">↩ Unarchive</button><button class="btn-decline" onclick="deleteB('${b.firebaseId}')" style="opacity:.8;">🗑 Delete</button>${msgBtn}`;
     const cls=`bcard${b.isVip?' is-vip':''}${b.status==='confirmed'?' is-confirmed':''}${b.status==='declined'?' is-declined':''}`;
     const cardInfo = b.stripeCard ? `<br><strong>💳 Card:</strong> ${b.stripeCard} <span style="color:#27ae60;font-size:.75rem;">✓ Saved</span>` : '';
     const packInfo = sessionPacks[b.id] ? `<br><strong>📦 Sessions:</strong> ${sessionPacks[b.id].remaining}/${sessionPacks[b.id].total} remaining <button onclick="useSession('${b.firebaseId}')" style="margin-left:6px;background:var(--gold);color:var(--green3);border:none;border-radius:3px;padding:2px 8px;font-size:.72rem;font-weight:700;cursor:pointer;">Mark Session Used</button>` : '';
