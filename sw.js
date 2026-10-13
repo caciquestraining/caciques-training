@@ -1,4 +1,4 @@
-const CACHE = 'caciques-v3';
+const CACHE = 'caciques-v4';
 const ASSETS = ['/', '/index.html', '/caciques-vip.html'];
 
 self.addEventListener('install', e => {
