@@ -1313,13 +1313,21 @@ function addSlot(){
 function removeSlot(day,idx){if(!confirm('Remove this slot?'))return;schedule[day].splice(idx,1);renderSchedule();}
 
 // Bookings
-function archiveB(id){
-  const b=bookings.find(x=>x.id===id);
+function archiveB(fid){
+  const b=bookings.find(x=>x.firebaseId===fid);
   if(!b)return;
   b.archived=true;
   updateBookingInFirebase(b);
   renderBookings();
   showToast('📁 Session archived');
+}
+function unarchiveB(fid){
+  const b=bookings.find(x=>x.firebaseId===fid);
+  if(!b)return;
+  b.archived=false;
+  updateBookingInFirebase(b);
+  renderBookings();
+  showToast('↩ Session restored');
 }
 function togglePastSessions(){const p=document.getElementById('pastSessionsPanel');if(p)p.style.display=p.style.display==='none'?'block':'none';}
 function setFilter(f,btn){currentFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBookings();}
@@ -1354,13 +1362,13 @@ function renderBookings(){
     const msgTxt=encodeURIComponent(`Hi ${b.contact}, this is Coach Alejandro from Caciques Training. I'd like to reschedule ${b.name}'s ${b.type} session. Please let me know your availability. Thank you!`);
     const msgBtn=b.phone?`<a href="sms:${b.phone.replace(/\D/g,'')}?body=${msgTxt}" class="btn-text" style="text-decoration:none;">💬 Message</a>`:'';
     const actions=b.status==='pending'
-      ?`<button class="btn-confirm" onclick="confirmB(${b.id})">✓ Confirm</button><button class="btn-decline" onclick="declineB(${b.id})">✕ Decline</button><button class="btn-text" onclick="rescheduleB(${b.id})">📅 Reschedule</button>${msgBtn}`
+      ?`<button class="btn-confirm" onclick="confirmB('${b.firebaseId}')">✓ Confirm</button><button class="btn-decline" onclick="declineB('${b.firebaseId}')">✕ Decline</button><button class="btn-text" onclick="rescheduleB('${b.firebaseId}')">📅 Reschedule</button>${msgBtn}`
       :b.status==='confirmed'
-      ?`<button class="btn-decline" onclick="declineB(${b.id})">✕ Cancel</button><button class="btn-text" onclick="rescheduleB(${b.id})">📅 Reschedule</button><button class="btn-text" onclick="archiveB(${b.id})" style="opacity:.7;">📁 Archive</button>${msgBtn}`
-      :`<button class="btn-confirm" onclick="confirmB(${b.id})">↩ Restore</button>${msgBtn}`;
+      ?`<button class="btn-decline" onclick="declineB('${b.firebaseId}')">✕ Cancel</button><button class="btn-text" onclick="rescheduleB('${b.firebaseId}')">📅 Reschedule</button><button class="btn-text" onclick="archiveB('${b.firebaseId}')" style="opacity:.7;">📁 Archive</button>${msgBtn}`
+      :`<button class="btn-confirm" onclick="confirmB('${b.firebaseId}')">↩ Restore</button><button class="btn-text" onclick="unarchiveB('${b.firebaseId}')" style="opacity:.7;">↩ Unarchive</button>${msgBtn}`;
     const cls=`bcard${b.isVip?' is-vip':''}${b.status==='confirmed'?' is-confirmed':''}${b.status==='declined'?' is-declined':''}`;
     const cardInfo = b.stripeCard ? `<br><strong>💳 Card:</strong> ${b.stripeCard} <span style="color:#27ae60;font-size:.75rem;">✓ Saved</span>` : '';
-    const packInfo = sessionPacks[b.id] ? `<br><strong>📦 Sessions:</strong> ${sessionPacks[b.id].remaining}/${sessionPacks[b.id].total} remaining <button onclick="useSession(${b.id})" style="margin-left:6px;background:var(--gold);color:var(--green3);border:none;border-radius:3px;padding:2px 8px;font-size:.72rem;font-weight:700;cursor:pointer;">Mark Session Used</button>` : '';
+    const packInfo = sessionPacks[b.id] ? `<br><strong>📦 Sessions:</strong> ${sessionPacks[b.id].remaining}/${sessionPacks[b.id].total} remaining <button onclick="useSession('${b.firebaseId}')" style="margin-left:6px;background:var(--gold);color:var(--green3);border:none;border-radius:3px;padding:2px 8px;font-size:.72rem;font-weight:700;cursor:pointer;">Mark Session Used</button>` : '';
     const extraPlayersInfo=b.extraPlayers&&b.extraPlayers.length?b.extraPlayers.map((p,i)=>`<br><strong>Player ${i+2}:</strong> ${p.name}${p.age?', Age '+p.age:''}`).join(''):'';
     return `<div class="${cls}"><div><div class="bc-name">${b.name} ${vipBadge}</div><div class="bc-meta"><strong>Type:</strong> ${b.type} · <strong>${b.day}</strong> @ ${b.time}${b.dateStr?` · <strong style='color:var(--gold);'>${new Date(b.dateStr).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</strong>`:''}<br><strong>Age:</strong> ${b.age} · <strong>Level:</strong> ${b.level} · <strong>Pos:</strong> ${b.positions}${extraPlayersInfo}<br><strong>Players:</strong> ${b.players||1}<br><strong>Contact:</strong> ${b.contact} · ${b.phone}<br><strong>Email:</strong> ${b.email} · <strong>Pay:</strong> ${b.payment}${cardInfo}${packInfo}${b.notes?`<br><strong>Notes:</strong> ${b.notes}`:''}</div><div class="bc-actions">${actions}</div></div><div>${smap[b.status]||''}</div></div>`;
   };
@@ -1372,12 +1380,14 @@ function renderBookings(){
   const pastEl=document.getElementById('pastSessionsList');
   if(pastEl) pastEl.innerHTML=pastList.length?`<div style="opacity:.8;">${pastList.map(renderCard).join('')}</div>`:'<div class="empty">No past sessions.</div>';
 }
-function useSession(id) {
+function useSession(fid) {
+  const b = bookings.find(x => x.firebaseId === fid);
+  if (!b) return;
+  const id = b.id;
   if (!sessionPacks[id]) return;
   if (sessionPacks[id].remaining <= 0) { alert('No sessions remaining in this pack.'); return; }
   sessionPacks[id].used++;
   sessionPacks[id].remaining--;
-  const b = bookings.find(x => x.id === id);
   if (sessionPacks[id].remaining === 0 && b) {
     // Notify parent pack is exhausted
     emailjs.send('service_idve8mt', 'template_egww4eo', {
@@ -1459,8 +1469,8 @@ async function sendEmail(b, status){
   }
 }
 
-async function confirmB(id){
-  const b=bookings.find(x=>x.id===id);
+async function confirmB(fid){
+  const b=bookings.find(x=>x.firebaseId===fid);
   if(!b) return;
 
   if(b.payment==='Card' && b.stripePaymentMethodId){
@@ -1505,9 +1515,9 @@ async function confirmB(id){
   showToast('✅ Booking confirmed'+(b.email?' — email sent to '+b.email:''));
 }
 
-function declineB(id){
+function declineB(fid){
   if(!confirm('Decline/cancel this booking?'))return;
-  const b=bookings.find(x=>x.id===id);
+  const b=bookings.find(x=>x.firebaseId===fid);
   if(b){
     b.status='declined';
     updateBookingInFirebase(b);
@@ -1658,9 +1668,9 @@ function renderWeeklySummary() {
 // ── RESCHEDULE ─────────────────────────────────────────────
 let rescheduleBookingId = null;
 
-function rescheduleB(id) {
-  rescheduleBookingId = id;
-  const b = bookings.find(x => x.id === id);
+function rescheduleB(fid) {
+  rescheduleBookingId = fid;
+  const b = bookings.find(x => x.firebaseId === fid);
   document.getElementById('rescheduleDate').value = '';
   document.getElementById('rescheduleTime').value = '';
   document.getElementById('rescheduleNote').value = '';
@@ -1678,7 +1688,7 @@ async function confirmReschedule() {
   const newTime = document.getElementById('rescheduleTime').value;
   const note = document.getElementById('rescheduleNote').value;
   if (!newDate || !newTime) { alert('Please select a new date and time.'); return; }
-  const b = bookings.find(x => x.id === rescheduleBookingId);
+  const b = bookings.find(x => x.firebaseId === rescheduleBookingId);
   if (!b) return;
   const d = new Date(newDate + 'T12:00:00');
   const newDay = d.toLocaleDateString('en-US', {weekday:'long'});
