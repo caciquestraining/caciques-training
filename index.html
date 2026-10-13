@@ -1377,8 +1377,13 @@ function renderBookings(){
   // Render past sessions in separate panel
   const pastBtn=document.getElementById('pastBtn');
   if(pastBtn) pastBtn.textContent=`📁 Past Sessions (${pastList.length})`;
+  const renderPastCard=b=>{
+    const base=renderCard(b);
+    const unarchiveBtn=`<button class="btn-confirm" onclick="unarchiveB('${b.firebaseId}')" style="margin-top:6px;">↩ Unarchive</button>`;
+    return base.replace('</div></div>',`${unarchiveBtn}</div></div>`);
+  };
   const pastEl=document.getElementById('pastSessionsList');
-  if(pastEl) pastEl.innerHTML=pastList.length?`<div style="opacity:.8;">${pastList.map(renderCard).join('')}</div>`:'<div class="empty">No past sessions.</div>';
+  if(pastEl) pastEl.innerHTML=pastList.length?`<div style="opacity:.8;">${pastList.map(renderPastCard).join('')}</div>`:'<div class="empty">No past sessions.</div>';
 }
 function useSession(fid) {
   const b = bookings.find(x => x.firebaseId === fid);
