@@ -999,8 +999,14 @@ async function saveBookingToFirebase(b) {
 }
 
 async function updateBookingInFirebase(b) {
-  if(!window.firebaseReady || !b.firebaseId) return;
+  if(!window.firebaseReady) return;
   try {
+    // If no firebaseId, try to find the doc by booking id
+    if(!b.firebaseId) {
+      const snap = await window.db.collection('bookings').where('id','==',b.id).get();
+      if(!snap.empty) { b.firebaseId = snap.docs[0].id; }
+      else { console.error('No Firebase doc found for booking id:', b.id); return; }
+    }
     const {firebaseId, ...data} = b;
     await window.db.collection('bookings').doc(firebaseId).set(data);
   } catch(err) { console.error('Error updating booking:', err); }
@@ -1012,7 +1018,6 @@ setTimeout(loadBookingsFromFirebase, 500);
 document.querySelectorAll('input[name="stype"]').forEach(r=>r.addEventListener('change',()=>{if(document.getElementById('pDate').value)loadSlots();}));
 
 function loadSlots(){
-  alert('loadSlots called! Date: ' + document.getElementById('pDate').value);
   try{
   const dv=document.getElementById('pDate').value;
   if(!dv){alert('Please select a date first.');return;}
@@ -1029,10 +1034,15 @@ function loadSlots(){
   if(!window.firebaseReady){
     console.log('Firebase not ready yet, showing slots without booking data');
   }
+  const today = new Date(); today.setHours(0,0,0,0);
   const bookedMap={};
   const blockedNext=new Set();
   bookings.forEach(b=>{
-    if(b.day===dayName&&b.status!=='declined'){
+    // Skip past bookings — they should never block future slots
+    if(b.dateStr && new Date(b.dateStr+'T12:00:00') < today) return;
+    // Match by exact date (dateStr) OR by day-of-week if no dateStr stored
+    const bDateMatch = b.dateStr ? b.dateStr===dv : b.day===dayName;
+    if(bDateMatch&&b.status!=='declined'){
       bookedMap[b.time]=(bookedMap[b.time]||0)+(b.players||1);
       // Block next slot if 2+ players OR batting+fielding (1 hour session)
       const isLong=(b.players||1)>1||(b.type&&b.type.toLowerCase().includes('batting')&&b.type.toLowerCase().includes('fielding'));
@@ -1297,37 +1307,50 @@ function removeSlot(day,idx){if(!confirm('Remove this slot?'))return;schedule[da
 function setFilter(f,btn){currentFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBookings();}
 function renderBookings(){
   renderWeeklySummary();
-  let list=bookings;
-  if(currentFilter==='pending')list=bookings.filter(b=>b.status==='pending');
-  else if(currentFilter==='confirmed')list=bookings.filter(b=>b.status==='confirmed');
-  else if(currentFilter==='vip')list=bookings.filter(b=>b.isVip);
-  if(!list.length){document.getElementById('bookingsList').innerHTML='<div class="empty">No bookings to show.</div>';return;}
-  list=[...list].sort((a,b)=>{
-    // Pending first
+  const todayStr=new Date().toISOString().split('T')[0];
+  // Past = has old dateStr, OR confirmed/declined with no dateStr (legacy bookings without date)
+  const isPast=b=>b.status!=='pending' && (b.dateStr ? b.dateStr < todayStr : true);
+  let allList=bookings;
+  if(currentFilter==='pending')allList=bookings.filter(b=>b.status==='pending');
+  else if(currentFilter==='confirmed')allList=bookings.filter(b=>b.status==='confirmed');
+  else if(currentFilter==='vip')allList=bookings.filter(b=>b.isVip);
+  // Split into active and past
+  const list=allList.filter(b=>!isPast(b));
+  const pastList=allList.filter(b=>isPast(b));
+  const dayOrder={Monday:0,Tuesday:1,Wednesday:2,Thursday:3,Friday:4,Saturday:5,Sunday:6};
+  const sortFn=(a,b)=>{
     if(a.status==='pending'&&b.status!=='pending') return -1;
     if(a.status!=='pending'&&b.status==='pending') return 1;
-    // Confirmed — sort by date ascending
-    if(a.status==='confirmed'&&b.status==='confirmed'){
-      const da=new Date(a.dateStr||'9999-12-31');
-      const db2=new Date(b.dateStr||'9999-12-31');
-      return da-db2;
-    }
-    return 0;
-  });
+    // Sort by date ascending (soonest first), then by day of week, then by time
+    const da=new Date(a.dateStr||'9999-12-31'), db2=new Date(b.dateStr||'9999-12-31');
+    if(da-db2!==0) return da-db2;
+    const dA=dayOrder[a.day]??7, dB=dayOrder[b.day]??7;
+    if(dA!==dB) return dA-dB;
+    return (a.time||'').localeCompare(b.time||'');
+  };
+  list.sort(sortFn);
+  pastList.sort((a,b)=>new Date(b.dateStr)-new Date(a.dateStr));
   const smap={pending:'<span class="bc-status s-pending">⏳ Pending</span>',confirmed:'<span class="bc-status s-confirmed">✓ Confirmed</span>',declined:'<span class="bc-status s-declined">✕ Declined</span>'};
-  document.getElementById('bookingsList').innerHTML=list.map(b=>{
+  const renderCard=b=>{
     const vipBadge=b.isVip?'<span class="bc-status s-vip">🏆 VIP</span>':'';
+    const msgTxt=encodeURIComponent(`Hi ${b.contact}, this is Coach Alejandro from Caciques Training. I'd like to reschedule ${b.name}'s ${b.type} session. Please let me know your availability. Thank you!`);
+    const msgBtn=b.phone?`<a href="sms:${b.phone.replace(/\D/g,'')}?body=${msgTxt}" class="btn-text" style="text-decoration:none;">💬 Message</a>`:'';
     const actions=b.status==='pending'
-      ?`<button class="btn-confirm" onclick="confirmB(${b.id})">✓ Confirm</button><button class="btn-decline" onclick="declineB(${b.id})">✕ Decline</button><button class="btn-text" onclick="rescheduleB(${b.id})">📅 Reschedule</button>`
+      ?`<button class="btn-confirm" onclick="confirmB(${b.id})">✓ Confirm</button><button class="btn-decline" onclick="declineB(${b.id})">✕ Decline</button><button class="btn-text" onclick="rescheduleB(${b.id})">📅 Reschedule</button>${msgBtn}`
       :b.status==='confirmed'
-      ?`<button class="btn-decline" onclick="declineB(${b.id})">✕ Cancel</button><button class="btn-text" onclick="rescheduleB(${b.id})">📅 Reschedule</button>`
-      :`<button class="btn-confirm" onclick="confirmB(${b.id})">↩ Restore</button>`;
+      ?`<button class="btn-decline" onclick="declineB(${b.id})">✕ Cancel</button><button class="btn-text" onclick="rescheduleB(${b.id})">📅 Reschedule</button>${msgBtn}`
+      :`<button class="btn-confirm" onclick="confirmB(${b.id})">↩ Restore</button>${msgBtn}`;
     const cls=`bcard${b.isVip?' is-vip':''}${b.status==='confirmed'?' is-confirmed':''}${b.status==='declined'?' is-declined':''}`;
     const cardInfo = b.stripeCard ? `<br><strong>💳 Card:</strong> ${b.stripeCard} <span style="color:#27ae60;font-size:.75rem;">✓ Saved</span>` : '';
     const packInfo = sessionPacks[b.id] ? `<br><strong>📦 Sessions:</strong> ${sessionPacks[b.id].remaining}/${sessionPacks[b.id].total} remaining <button onclick="useSession(${b.id})" style="margin-left:6px;background:var(--gold);color:var(--green3);border:none;border-radius:3px;padding:2px 8px;font-size:.72rem;font-weight:700;cursor:pointer;">Mark Session Used</button>` : '';
     const extraPlayersInfo=b.extraPlayers&&b.extraPlayers.length?b.extraPlayers.map((p,i)=>`<br><strong>Player ${i+2}:</strong> ${p.name}${p.age?', Age '+p.age:''}`).join(''):'';
     return `<div class="${cls}"><div><div class="bc-name">${b.name} ${vipBadge}</div><div class="bc-meta"><strong>Type:</strong> ${b.type} · <strong>${b.day}</strong> @ ${b.time}${b.dateStr?` · <strong style='color:var(--gold);'>${new Date(b.dateStr).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</strong>`:''}<br><strong>Age:</strong> ${b.age} · <strong>Level:</strong> ${b.level} · <strong>Pos:</strong> ${b.positions}${extraPlayersInfo}<br><strong>Players:</strong> ${b.players||1}<br><strong>Contact:</strong> ${b.contact} · ${b.phone}<br><strong>Email:</strong> ${b.email} · <strong>Pay:</strong> ${b.payment}${cardInfo}${packInfo}${b.notes?`<br><strong>Notes:</strong> ${b.notes}`:''}</div><div class="bc-actions">${actions}</div></div><div>${smap[b.status]||''}</div></div>`;
-  }).join('');
+  };
+  let html = list.length ? list.map(renderCard).join('') : '<div class="empty">No upcoming bookings.</div>';
+  if(pastList.length){
+    html += `<details style="margin-top:24px;"><summary style="cursor:pointer;font-weight:700;color:var(--gold);font-size:.9rem;padding:10px 0;border-top:1px solid rgba(255,255,255,.1);">📁 Past Sessions (${pastList.length})</summary><div style="margin-top:12px;opacity:.75;">${pastList.map(renderCard).join('')}</div></details>`;
+  }
+  document.getElementById('bookingsList').innerHTML=html;
 }
 function useSession(id) {
   if (!sessionPacks[id]) return;
@@ -1454,11 +1477,12 @@ async function confirmB(id){
 
   b.status='confirmed';
   await updateBookingInFirebase(b);
-  sendEmail(b,'confirmed');
+  if(b.email) sendEmail(b,'confirmed');
+  else console.warn('No email for booking', b.id, b.name);
   saveToSheets(b,'confirmed');
   renderBookings();
   renderSchedule();
-  showToast('✅ Booking confirmed — email sent to '+(b.contact||b.name));
+  showToast('✅ Booking confirmed'+(b.email?' — email sent to '+b.email:''));
 }
 
 function declineB(id){
