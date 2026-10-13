@@ -332,6 +332,19 @@ const PRICES = {
   'VIP Private Lesson': 100,
 };
 
+// Calculate the actual amount charged for a booking
+function getActualAmount(b) {
+  // If the booking has a stored chargedAmount, use that
+  if (b.chargedAmount) return b.chargedAmount;
+  const base = PRICES[b.type] || 60;
+  const players = b.players || 1;
+  const disc = players === 3 ? 0.83 : players === 2 ? 0.90 : 1;
+  return Math.round(base * players * disc);
+}
+
+// Track which 4-Session Packs already counted to avoid double-counting sessions
+const countedPacks = new Set();
+
 // Sample bookings (in real use these come from the main site)
 let bookings = [];
 
@@ -339,16 +352,26 @@ async function loadBookingsFromFirebase() {
   try {
     const snap = await firebase.firestore().collection('bookings').get();
     bookings = [];
+    countedPacks.clear();
     snap.forEach(doc => {
       const b = doc.data();
       if (b.status === 'confirmed') {
-        // Convert dateStr to date field
         let date = b.date || '';
         if (!date && b.dateStr) {
-          const d = new Date(b.dateStr);
+          const d = new Date(b.dateStr + 'T12:00:00');
           if (!isNaN(d)) date = d.toISOString().split('T')[0];
         }
-        bookings.push({...b, date});
+        // For 4-Session Pack: only count revenue once per pack code
+        let skipRevenue = false;
+        if (b.type === '4-Session Pack') {
+          const packKey = b.packageCode || ('pack_' + b.id);
+          if (countedPacks.has(packKey)) {
+            skipRevenue = true; // already counted this pack
+          } else {
+            countedPacks.add(packKey);
+          }
+        }
+        bookings.push({...b, date, skipRevenue});
       }
     });
     renderAll();
@@ -431,7 +454,7 @@ function updateKPIs(){
   const filteredBookings = bookings.filter(b => b.status === 'confirmed' && inRange(b.date, currentPeriod));
   const filteredExpenses = expenses.filter(e => inRange(e.date, currentPeriod));
 
-  const totalIncome = filteredBookings.reduce((s,b) => s + (PRICES[b.type]||0), 0);
+  const totalIncome = filteredBookings.filter(b=>!b.skipRevenue).reduce((s,b) => s + getActualAmount(b), 0);
   const totalExpense = filteredExpenses.reduce((s,e) => s + e.amount, 0);
   const netProfit = totalIncome - totalExpense;
   const margin = totalIncome > 0 ? Math.round((netProfit/totalIncome)*100) : 0;
@@ -478,7 +501,7 @@ function updateIncomeExpenseChart(){
     weekEnd.setDate(weekStart.getDate() + 6);
     const label = weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'});
     weeks.push(label);
-    const wIncome = bookings.filter(b=> b.status==='confirmed' && new Date(b.date+'T12:00:00')>=weekStart && new Date(b.date+'T12:00:00')<=weekEnd).reduce((s,b)=>s+(PRICES[b.type]||0),0);
+    const wIncome = bookings.filter(b=> b.status==='confirmed' && !b.skipRevenue && new Date(b.date+'T12:00:00')>=weekStart && new Date(b.date+'T12:00:00')<=weekEnd).reduce((s,b)=>s+getActualAmount(b),0);
     const wExp = expenses.filter(e=> new Date(e.date+'T12:00:00')>=weekStart && new Date(e.date+'T12:00:00')<=weekEnd).reduce((s,e)=>s+e.amount,0);
     incomes.push(wIncome);
     exps.push(wExp);
@@ -501,7 +524,7 @@ function updateSessionTypeChart(){
   destroyChart('sessionType');
   const filtered = bookings.filter(b => b.status==='confirmed' && inRange(b.date, currentPeriod));
   const typeMap = {};
-  filtered.forEach(b => { typeMap[b.type] = (typeMap[b.type]||0) + (PRICES[b.type]||0); });
+  filtered.filter(b=>!b.skipRevenue).forEach(b => { typeMap[b.type] = (typeMap[b.type]||0) + getActualAmount(b); });
   const labels = Object.keys(typeMap);
   const data = Object.values(typeMap);
   const colors = ['#F5A623','#22c55e','#3b82f6','#a855f7','#f43f5e'];
@@ -540,7 +563,7 @@ function updateWeeklyTrendChart(){
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
     weeks.push(weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'}));
-    const rev = bookings.filter(b=> b.status==='confirmed' && new Date(b.date+'T12:00:00')>=weekStart && new Date(b.date+'T12:00:00')<=weekEnd).reduce((s,b)=>s+(PRICES[b.type]||0),0);
+    const rev = bookings.filter(b=> b.status==='confirmed' && !b.skipRevenue && new Date(b.date+'T12:00:00')>=weekStart && new Date(b.date+'T12:00:00')<=weekEnd).reduce((s,b)=>s+getActualAmount(b),0);
     revenues.push(rev);
   }
   const ctx = document.getElementById('weeklyTrendChart').getContext('2d');
@@ -557,7 +580,7 @@ function updateWeeklyTrendChart(){
 // ── TRANSACTIONS TABLE ────────────────────────────────────────
 function updateTable(){
   const filteredBookings = bookings.filter(b => b.status==='confirmed' && inRange(b.date, currentPeriod))
-    .map(b => ({id:'b_'+b.id, date:b.date, type:'income', desc:b.name+' — '+b.type, category:b.type, payment:b.payment, amount:PRICES[b.type]||0}));
+    .filter(b=>!b.skipRevenue).map(b => ({id:'b_'+b.id, date:b.date, type:'income', desc:b.name+' — '+b.type+(b.players>1?' ('+b.players+' players)':''), category:b.type, payment:b.payment, amount:getActualAmount(b)}));
   const filteredExpenses = expenses.filter(e => inRange(e.date, currentPeriod))
     .map(e => ({id:'e_'+e.id, date:e.date, type:'expense', desc:e.desc, category:e.category, payment:'—', amount:-e.amount}));
 
@@ -629,7 +652,7 @@ function exportCSV(){
   let csv = 'Date,Type,Description,Category,Payment Method,Amount\n';
 
   filteredBookings.forEach(b => {
-    csv += `${b.date},Income,${b.name} — ${b.type},${b.type},${b.payment},${(PRICES[b.type]||0).toFixed(2)}\n`;
+    if(!b.skipRevenue) csv += `${b.date},Income,${b.name} — ${b.type}${b.players>1?' ('+b.players+' players)':''},${b.type},${b.payment},${getActualAmount(b).toFixed(2)}\n`;
   });
   filteredExpenses.forEach(e => {
     csv += `${e.date},Expense,${e.desc},${e.category},—,-${e.amount.toFixed(2)}\n`;
